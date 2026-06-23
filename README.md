@@ -1,16 +1,48 @@
-# React + Vite
+VectorCommerce Storefront – User Side
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern customer-facing e-commerce application built with React.js and Vite for the High-Performance E-Commerce Engine with AI Vector Search internship project. The application provides product browsing, AI-powered search, product details, and shopping cart functionality through a responsive and user-friendly interface.
 
-Currently, two official plugins are available:
+Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Home Page
+- Product Listing Page
+- Product Details Page
+- AI Search Page
+- Shopping Cart
+- User Login
+- Responsive Design
 
-## React Compiler
+Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React.js
+- Vite
+- JavaScript (ES6+)
+- CSS/Tailwind CSS
+- React Router DOM
 
-## Expanding the ESLint configuration
+Current Folder Structure
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+src/
+├── assets/
+├── App.jsx
+├── Home.jsx
+├── Login.jsx
+├── ProductListing.jsx
+├── ProductDetails.jsx
+├── Search.jsx
+├── Cart.jsx
+├── productsData.js
+└── main.jsx
+
+Setup Instructions
+
+1. Install Dependencies
+   npm install
+
+2. Run Development Server
+   npm run dev
+
+3. Open in Browser
+   http://localhost:5173
+
+This module represents the customer side of the VectorCommerce platform and will be integrated with Express APIs, MongoDB Atlas, Redis Cache, and AI Semantic Search in the upcoming development phases.
