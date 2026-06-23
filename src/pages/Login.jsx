@@ -74,7 +74,7 @@ export default function Login() {
 
           <div className="space-y-1.5">
             <label className="text-xs font-semibold text-slate-300 tracking-wide block">
-              EMAIL ADDRESS
+              EMAIL ADDRESS ENTER
             </label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-500" />
