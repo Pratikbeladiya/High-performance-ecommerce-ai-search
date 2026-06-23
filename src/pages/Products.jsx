@@ -98,7 +98,7 @@ export default function Products() {
           className="py-2 px-4 bg-indigo-650 hover:bg-indigo-600 active:bg-indigo-700 text-white font-semibold rounded-xl text-xs shadow-md shadow-indigo-600/10 hover:shadow-lg transition-all flex items-center gap-1.5 cursor-pointer"
         >
           <Plus className="w-4 h-4" />
-          Add Product
+          Add Product Here
         </Link>
       </PageHeader>
 
