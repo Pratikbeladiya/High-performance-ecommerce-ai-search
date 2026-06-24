@@ -39,13 +39,13 @@ export default function AddProduct() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Add Product"
+        title="Add Product Item"
         subtitle="Catalog a new product in the database. Vector embeddings will be compiled automatically."
       />
 
       <ProductForm
         onSubmit={handleCreateProduct}
-        buttonText="Create Product"
+        buttonText="Create Product Item"
       />
     </div>
   );
