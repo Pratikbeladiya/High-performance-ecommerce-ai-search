@@ -36,7 +36,7 @@ export default function Login() {
         setIsLoading(false);
         navigate("/admin/dashboard");
       } else {
-        setError("Invalid email or password. Hint: admin@vectorcommerce.io / password123");
+        setError("Given Invalid email or password. Hint: admin@vectorcommerce.io / password123");
         setIsLoading(false);
       }
     }, 800);
