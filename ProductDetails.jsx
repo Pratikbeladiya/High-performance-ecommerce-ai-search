@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 export default function ProductDetails({ product, setView, addToCart }) {
   const [quantity, setQuantity] = useState(1);

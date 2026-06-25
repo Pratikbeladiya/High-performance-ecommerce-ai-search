@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { DUMMY_PRODUCTS } from './productsData';
 
 export default function Home({ setView, setSelectedProduct, handleSearchSubmit, addToCart }) {

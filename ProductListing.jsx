@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { DUMMY_PRODUCTS } from './productsData';
 
 export default function ProductListing({ setView, setSelectedProduct, addToCart }) {
