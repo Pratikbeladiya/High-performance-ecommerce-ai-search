@@ -1,4 +1,3 @@
-import React from "react";
 import {
   BarChart,
   Bar,
@@ -39,7 +38,7 @@ export default function InventoryChart({ products = [] }) {
                 color: "#e2e8f0",
                 fontSize: "11px"
               }}
-              formatter={(value, name, props) => [value, "Stock Level"]}
+              formatter={(value) => [value, "Stock Level"]}
               labelFormatter={(label, items) => {
                 if (items[0]) return items[0].payload.fullName;
                 return label;

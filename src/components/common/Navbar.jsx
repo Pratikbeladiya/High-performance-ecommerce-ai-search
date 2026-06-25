@@ -1,24 +1,23 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import { Menu, Bell, Search, User, ShieldCheck } from "lucide-react";
 
 export default function Navbar({ onMenuClick }) {
-  const [user, setUser] = useState({ email: "admin@vectorcommerce.io", role: "Super Admin" });
+  const [user] = useState(() => {
+    const storedUser = localStorage.getItem("admin_user");
+    if (storedUser) {
+      try {
+        return JSON.parse(storedUser);
+      } catch {
+        // Fallback to default
+      }
+    }
+    return { email: "admin@vectorcommerce.io", role: "Super Admin" };
+  });
   const [notifications, setNotifications] = useState([
     { id: 1, text: "Low stock alert: Smartwatch", unread: true },
     { id: 2, text: "New order #10892 received", unread: true }
   ]);
   const [showNotifMenu, setShowNotifMenu] = useState(false);
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem("admin_user");
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (e) {
-        // Fallback to default
-      }
-    }
-  }, []);
 
   const hasUnread = notifications.some(n => n.unread);
 

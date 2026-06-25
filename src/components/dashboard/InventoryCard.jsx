@@ -1,12 +1,12 @@
-import React from "react";
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
-import { AlertTriangle, AlertCircle, CheckCircle, PackageSearch } from "lucide-react";
+import { AlertTriangle, AlertCircle, CheckCircle } from "lucide-react";
 
 export default function InventoryCard({ products = [] }) {
   // Filter for low stock or out of stock items
-  const alertProducts = products
-    .filter((p) => p.stock <= 5)
-    .slice(0, 5); // display top 5 alerts
+  const alertProducts = useMemo(() => {
+    return products.filter((p) => p.stock <= 5).slice(0, 5); // display top 5 alerts
+  }, [products]);
 
   return (
     <div className="glass-panel p-6 rounded-2xl flex flex-col h-full">
@@ -36,11 +36,14 @@ export default function InventoryCard({ products = [] }) {
           <div className="divide-y divide-slate-800/60">
             {alertProducts.map((product) => {
               const isOutOfStock = product.stock === 0;
+              const stockStatusClass = isOutOfStock
+                ? "bg-rose-500/10 text-rose-400 border border-rose-500/10"
+                : "bg-amber-500/10 text-amber-400 border border-amber-500/10";
+              const progressBarColor = isOutOfStock ? "bg-rose-500" : "bg-amber-500";
+              const progressBarWidth = `${Math.max(product.stock * 20, 5)}%`;
+
               return (
-                <div
-                  key={product.id}
-                  className="flex items-center justify-between py-3 first:pt-0 last:pb-0"
-                >
+                <div key={product.id} className="flex items-center justify-between py-3 first:pt-0 last:pb-0">
                   <div className="flex items-center gap-3">
                     <img
                       src={product.imageUrl}
@@ -58,13 +61,7 @@ export default function InventoryCard({ products = [] }) {
                   </div>
 
                   <div className="text-right">
-                    <span
-                      className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                        isOutOfStock
-                          ? "bg-rose-500/10 text-rose-400 border border-rose-500/10"
-                          : "bg-amber-500/10 text-amber-400 border border-amber-500/10"
-                      }`}
-                    >
+                    <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${stockStatusClass}`}>
                       {isOutOfStock ? (
                         <AlertCircle className="w-3 h-3" />
                       ) : (
@@ -76,10 +73,8 @@ export default function InventoryCard({ products = [] }) {
                     {/* Visual stock progress bar */}
                     <div className="w-20 bg-slate-800 h-1 rounded-full mt-2 ml-auto overflow-hidden">
                       <div
-                        className={`h-full rounded-full ${
-                          isOutOfStock ? "bg-rose-500" : "bg-amber-500"
-                        }`}
-                        style={{ width: `${Math.max(product.stock * 20, 5)}%` }}
+                        className={`h-full rounded-full ${progressBarColor}`}
+                        style={{ width: progressBarWidth }}
                       />
                     </div>
                   </div>

@@ -1,4 +1,3 @@
-import React from "react";
 import { Terminal, Database, Clock, Ban } from "lucide-react";
 
 export default function TraditionalSearch({

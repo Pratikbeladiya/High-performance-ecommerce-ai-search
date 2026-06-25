@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import Sidebar from "../components/common/Sidebar";
 import Navbar from "../components/common/Navbar";
@@ -6,18 +6,16 @@ import Footer from "../components/common/Footer";
 
 export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [isCheckingAuth] = useState(() => {
+    return localStorage.getItem("admin_auth") !== "true";
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Simple Local Auth Protection
-    const isAuthenticated = localStorage.getItem("admin_auth");
-    if (isAuthenticated !== "true") {
+    if (isCheckingAuth) {
       navigate("/admin/login");
-    } else {
-      setIsCheckingAuth(false);
     }
-  }, [navigate]);
+  }, [isCheckingAuth, navigate]);
 
   if (isCheckingAuth) {
     return (

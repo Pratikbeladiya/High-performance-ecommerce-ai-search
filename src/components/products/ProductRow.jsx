@@ -1,5 +1,4 @@
-import React from "react";
-import { Edit3, Trash2, AlertCircle, CheckCircle2, RefreshCw } from "lucide-react";
+import { Edit3, Trash2, AlertCircle, CheckCircle2, Eye, EyeOff } from "lucide-react";
 
 export default function ProductRow({ product, onEdit, onDelete }) {
   const getStatusBadge = (status) => {
@@ -86,6 +85,17 @@ export default function ProductRow({ product, onEdit, onDelete }) {
       {/* Row Actions */}
       <td className="px-6 py-4 whitespace-nowrap text-right text-xs">
         <div className="flex items-center justify-end gap-2.5">
+          {/* Visibility indicator */}
+          <span
+            title={product.isVisible !== false ? 'Visible on Storefront' : 'Hidden from Storefront'}
+            className={`p-1.5 rounded-lg border ${
+              product.isVisible !== false
+                ? 'text-emerald-400 border-emerald-500/20 bg-emerald-500/10'
+                : 'text-slate-500 border-slate-700 bg-slate-800/40'
+            }`}
+          >
+            {product.isVisible !== false ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+          </span>
           <button
             onClick={() => onEdit(product.id)}
             className="p-1.5 text-slate-400 hover:text-indigo-400 hover:bg-slate-800/60 rounded-lg border border-transparent hover:border-slate-800 transition-all cursor-pointer"

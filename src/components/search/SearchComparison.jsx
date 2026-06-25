@@ -1,4 +1,3 @@
-import React from "react";
 import TraditionalSearch from "./TraditionalSearch";
 import AISearch from "./AISearch";
 import { Search, Info } from "lucide-react";

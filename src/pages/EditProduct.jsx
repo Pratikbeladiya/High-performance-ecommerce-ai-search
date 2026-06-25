@@ -1,48 +1,23 @@
-import React, { useState, useEffect } from "react";
+import { useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import PageHeader from "../components/common/PageHeader";
 import ProductForm from "../components/products/ProductForm";
-import EmptyState from "../components/common/EmptyState";
 import { initialProducts } from "../data/products";
+import EmptyState from "../components/common/EmptyState";
 import { PackageSearch } from "lucide-react";
+import { getProductsFromLocalStorage, setProductsToLocalStorage } from "../utils/localStorageHelpers";
 
 export default function EditProduct() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const stored = localStorage.getItem("admin_products");
-    let currentList = initialProducts;
-
-    if (stored) {
-      try {
-        currentList = JSON.parse(stored);
-      } catch (e) {
-        // use default
-      }
-    }
-
-    const found = currentList.find((p) => p.id === id);
-    if (found) {
-      setProduct(found);
-    }
-    setLoading(false);
+  const product = useMemo(() => {
+    const currentList = getProductsFromLocalStorage(initialProducts);
+    return currentList.find((p) => p.id === id) || null;
   }, [id]);
 
   const handleUpdateProduct = (updatedProduct) => {
-    const stored = localStorage.getItem("admin_products");
-    let currentList = initialProducts;
-
-    if (stored) {
-      try {
-        currentList = JSON.parse(stored);
-      } catch (e) {
-        // use default
-      }
-    }
-
+    const currentList = getProductsFromLocalStorage(initialProducts);
     const updatedList = currentList.map((p) =>
       p.id === id
         ? {
@@ -53,22 +28,15 @@ export default function EditProduct() {
               updatedProduct.category.toLowerCase(),
               ...updatedProduct.name.toLowerCase().split(" ").filter(w => w.length > 2)
             ],
-            aiEmbeddingsContext: `Conceptual representation of ${updatedProduct.name}. Category: ${updatedProduct.category}. Details: ${updatedProduct.description}`
+            aiEmbeddingsContext: `Conceptual representation of ${updatedProduct.name}. Category: ${updatedProduct.category}. Details: ${updatedProduct.description}`,
           }
         : p
     );
 
-    localStorage.setItem("admin_products", JSON.stringify(updatedList));
+    setProductsToLocalStorage(updatedList);
     navigate("/admin/products");
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="w-8 h-8 border-3 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin" />
-      </div>
-    );
-  }
 
   if (!product) {
     return (
@@ -92,6 +60,7 @@ export default function EditProduct() {
       />
 
       <ProductForm
+        key={product.id}
         initialData={product}
         onSubmit={handleUpdateProduct}
         buttonText="Save Changes"
