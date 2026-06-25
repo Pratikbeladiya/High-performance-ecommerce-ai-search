@@ -1,4 +1,3 @@
-import React from "react";
 import { Cpu, Zap, Clock, Info, Check } from "lucide-react";
 
 export default function AISearch({

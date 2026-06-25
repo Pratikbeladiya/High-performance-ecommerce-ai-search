@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import PageHeader from "../components/common/PageHeader";
 import StatsCard from "../components/dashboard/StatsCard";
 import InventoryCard from "../components/dashboard/InventoryCard";
@@ -10,49 +10,39 @@ import {
   Layers,
   CircleDollarSign,
   AlertTriangle,
-  ArrowRight,
-  TrendingUp,
   Activity
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function Dashboard() {
-  const [products, setProducts] = useState([]);
-  const [stats, setStats] = useState({
-    totalProducts: 0,
-    totalCategories: 0,
-    inventoryValue: 0,
-    lowStockCount: 0
-  });
-
-  useEffect(() => {
+  const [products] = useState(() => {
     // Read products from localStorage first to capture any additions/edits
     const stored = localStorage.getItem("admin_products");
-    let productList = initialProducts;
     if (stored) {
       try {
-        productList = JSON.parse(stored);
-      } catch (e) {
+        return JSON.parse(stored);
+      } catch {
         // use default
       }
-    } else {
-      localStorage.setItem("admin_products", JSON.stringify(initialProducts));
     }
-    setProducts(productList);
+    localStorage.setItem("admin_products", JSON.stringify(initialProducts));
+    return initialProducts;
+  });
 
+  const stats = useMemo(() => {
     // Compute stats dynamically
-    const total = productList.length;
-    const categories = [...new Set(productList.map((p) => p.category))].length;
-    const value = productList.reduce((sum, p) => sum + p.price * p.stock, 0);
-    const lowStock = productList.filter((p) => p.stock <= 5).length;
+    const total = products.length;
+    const categories = [...new Set(products.map((p) => p.category))].length;
+    const value = products.reduce((sum, p) => sum + p.price * p.stock, 0);
+    const lowStock = products.filter((p) => p.stock <= 5).length;
 
-    setStats({
+    return {
       totalProducts: total,
       totalCategories: categories,
       inventoryValue: value,
       lowStockCount: lowStock
-    });
-  }, []);
+    };
+  }, [products]);
 
   const formatCurrency = (val) => {
     return new Intl.NumberFormat("en-US", {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import PageHeader from "../components/common/PageHeader";
 import SearchComparison from "../components/search/SearchComparison";
 import { searchTestCases } from "../data/analytics";
@@ -7,39 +7,25 @@ import { Sparkles } from "lucide-react";
 
 export default function SearchTesting() {
   const [searchQuery, setSearchQuery] = useState("something to listen to music while jogging");
-  const [products, setProducts] = useState([]);
-  const [traditionalResults, setTraditionalResults] = useState({
-    latency: "0ms",
-    queryType: "SQL SELECT",
-    results: [],
-    matchedTokens: []
-  });
-  const [aiResults, setAiResults] = useState({
-    latency: "0ms",
-    queryType: "Vector Similarity",
-    results: []
-  });
-
-  // Load products on mount
-  useEffect(() => {
+  const [products] = useState(() => {
     const stored = localStorage.getItem("admin_products");
     if (stored) {
       try {
-        setProducts(JSON.parse(stored));
-      } catch (e) {
-        setProducts(initialProducts);
+        return JSON.parse(stored);
+      } catch {
+        return initialProducts;
       }
-    } else {
-      setProducts(initialProducts);
     }
-  }, []);
+    return initialProducts;
+  });
 
-  // Run search simulation when query or products change
-  useEffect(() => {
+  // Derived search results using useMemo instead of useEffect
+  const { traditionalResults, aiResults } = useMemo(() => {
     if (!searchQuery.trim()) {
-      setTraditionalResults({ latency: "0ms", queryType: "SQL SELECT", results: [], matchedTokens: [] });
-      setAiResults({ latency: "0ms", queryType: "Vector Similarity", results: [] });
-      return;
+      return {
+        traditionalResults: { latency: "0ms", queryType: "SQL SELECT", results: [], matchedTokens: [] },
+        aiResults: { latency: "0ms", queryType: "Vector Similarity", results: [] }
+      };
     }
 
     const cleanQuery = searchQuery.trim().toLowerCase();
@@ -56,29 +42,27 @@ export default function SearchTesting() {
         return currentProd ? { ...currentProd, ...r } : null;
       }).filter(Boolean);
 
-      setTraditionalResults({
-        ...preDefined.traditional,
-        results: tradResults
-      });
-
-      // AI results from test case
       const aiResultsList = preDefined.ai.results.map((r) => {
         const currentProd = products.find((p) => p.id === r.id);
         return currentProd ? { ...currentProd, ...r } : null;
       }).filter(Boolean);
 
-      setAiResults({
-        ...preDefined.ai,
-        results: aiResultsList
-      });
-      return;
+      return {
+        traditionalResults: {
+          ...preDefined.traditional,
+          results: tradResults
+        },
+        aiResults: {
+          ...preDefined.ai,
+          results: aiResultsList
+        }
+      };
     }
 
     // 2. Custom query simulation
     const tokens = cleanQuery.split(/\s+/).filter((t) => t.length > 2);
     
     // Traditional Search Simulation: Strict text substring
-    const startTradTime = performance.now();
     const tradMatches = products.filter((p) => {
       return tokens.some(
         (t) =>
@@ -86,23 +70,20 @@ export default function SearchTesting() {
           p.tags.some((tag) => tag.toLowerCase() === t)
       );
     });
-    const endTradTime = performance.now();
-    const tradLatency = `${Math.max(1, Math.round(endTradTime - startTradTime))}ms`;
+    const tradLatency = `${Math.max(1, Math.round(tradMatches.length * 0.2))}ms`;
     
     const matchedTokens = tokens.filter(t => 
       products.some(p => p.name.toLowerCase().includes(t) || p.tags.some(tag => tag.toLowerCase() === t))
     );
 
-    setTraditionalResults({
+    const tradResults = {
       latency: tradLatency,
       queryType: `SELECT * FROM products WHERE (${tokens.map(t => `name LIKE '%${t}%'`).join(" OR ")})`,
       results: tradMatches,
       matchedTokens: matchedTokens
-    });
+    };
 
     // AI Semantic Search Simulation: Semantic matching on description + tag embeddings
-    const startAiTime = performance.now();
-    
     // Calculate simulated semantic weights
     const aiMatches = products
       .map((p) => {
@@ -175,16 +156,19 @@ export default function SearchTesting() {
       // Sort by relevancy score
       .sort((a, b) => b.relevancy - a.relevancy);
 
-    const endAiTime = performance.now();
     // AI searches take longer than local SELECTs due to vector arithmetic
-    const aiLatency = `${Math.round(endAiTime - startAiTime + 35)}ms`; 
+    const aiLatency = `${Math.round(aiMatches.length * 0.5 + 35)}ms`; 
 
-    setAiResults({
+    const aiResultsObj = {
       latency: aiLatency,
       queryType: "Vector Similarity (Cosine Distance on OpenAI embeddings-3-large)",
       results: aiMatches
-    });
+    };
 
+    return {
+      traditionalResults: tradResults,
+      aiResults: aiResultsObj
+    };
   }, [searchQuery, products]);
 
   const suggestedQueries = [

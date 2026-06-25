@@ -1,28 +1,25 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import PageHeader from "../components/common/PageHeader";
 import SalesChart from "../components/analytics/SalesChart";
 import CategoryChart from "../components/analytics/CategoryChart";
 import InventoryChart from "../components/analytics/InventoryChart";
 import { salesTrends, categoryDistribution } from "../data/analytics";
 import { initialProducts } from "../data/products";
-import { Zap, HelpCircle, RefreshCw } from "lucide-react";
+import { Zap, RefreshCw } from "lucide-react";
 
 export default function Analytics() {
-  const [products, setProducts] = useState([]);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-
-  useEffect(() => {
+  const [products] = useState(() => {
     const stored = localStorage.getItem("admin_products");
     if (stored) {
       try {
-        setProducts(JSON.parse(stored));
-      } catch (e) {
-        setProducts(initialProducts);
+        return JSON.parse(stored);
+      } catch {
+        return initialProducts;
       }
-    } else {
-      setProducts(initialProducts);
     }
-  }, []);
+    return initialProducts;
+  });
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleRefreshData = () => {
     setIsRefreshing(true);

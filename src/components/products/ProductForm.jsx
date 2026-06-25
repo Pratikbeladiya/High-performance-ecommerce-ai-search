@@ -1,35 +1,23 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Save, ArrowLeft, Image as ImageIcon } from "lucide-react";
+import { Save, ArrowLeft, Image as ImageIcon, Eye, EyeOff } from "lucide-react";
 
 export default function ProductForm({
   initialData,
   onSubmit,
   buttonText = "Save Product"
 }) {
-  const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    price: "",
-    category: "Electronics",
-    stock: "",
-    imageUrl: ""
-  });
+  const [formData, setFormData] = useState(() => ({
+    name: initialData?.name || "",
+    description: initialData?.description || "",
+    price: initialData?.price || "",
+    category: initialData?.category || "Electronics",
+    stock: initialData?.stock || "",
+    imageUrl: initialData?.imageUrl || "",
+    isVisible: initialData?.isVisible !== undefined ? initialData.isVisible : true
+  }));
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  useEffect(() => {
-    if (initialData) {
-      setFormData({
-        name: initialData.name || "",
-        description: initialData.description || "",
-        price: initialData.price || "",
-        category: initialData.category || "Electronics",
-        stock: initialData.stock || "",
-        imageUrl: initialData.imageUrl || ""
-      });
-    }
-  }, [initialData]);
 
   const categories = ["Electronics", "Home & Living", "Apparel"];
 
@@ -229,6 +217,28 @@ export default function ProductForm({
                   <span className="text-xs text-slate-500">Image Preview Window</span>
                 </div>
               )}
+            </div>
+
+            {/* Storefront Visibility Toggle */}
+            <div className="flex items-center justify-between p-4 bg-slate-900 rounded-xl border border-slate-800">
+              <div className="flex items-center gap-3">
+                {formData.isVisible ? <Eye className="w-4 h-4 text-emerald-400" /> : <EyeOff className="w-4 h-4 text-slate-500" />}
+                <div>
+                  <p className="text-xs font-semibold text-slate-300">Storefront Visibility</p>
+                  <p className="text-[10px] text-slate-500">{formData.isVisible ? 'Visible to customers' : 'Hidden from store'}</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setFormData(prev => ({ ...prev, isVisible: !prev.isVisible }))}
+                className={`relative w-11 h-6 rounded-full transition-all cursor-pointer ${
+                  formData.isVisible ? 'bg-emerald-600' : 'bg-slate-700'
+                }`}
+              >
+                <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-all duration-300 ${
+                  formData.isVisible ? 'left-5' : 'left-0.5'
+                }`} />
+              </button>
             </div>
           </div>
         </div>

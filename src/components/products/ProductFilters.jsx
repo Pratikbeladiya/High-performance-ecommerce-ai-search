@@ -1,4 +1,3 @@
-import React from "react";
 import SearchBar from "../common/SearchBar";
 import { Filter, RotateCcw } from "lucide-react";
 

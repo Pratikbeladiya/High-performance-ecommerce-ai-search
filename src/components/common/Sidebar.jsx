@@ -1,4 +1,3 @@
-import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -16,7 +15,7 @@ export default function Sidebar({ isOpen, onClose }) {
 
   const handleLogout = () => {
     localStorage.removeItem("admin_auth");
-    localStorage.removeItem("admin_user");
+    localStorage.removeItem("admin_user"); // This is fine as it's not product data
     navigate("/admin/login");
   };
 

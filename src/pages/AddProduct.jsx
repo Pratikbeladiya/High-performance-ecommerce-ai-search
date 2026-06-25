@@ -1,24 +1,14 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
 import PageHeader from "../components/common/PageHeader";
 import ProductForm from "../components/products/ProductForm";
 import { initialProducts } from "../data/products";
+import { getProductsFromLocalStorage, setProductsToLocalStorage } from "../utils/localStorageHelpers";
 
 export default function AddProduct() {
   const navigate = useNavigate();
 
   const handleCreateProduct = (newProduct) => {
-    const stored = localStorage.getItem("admin_products");
-    let currentList = initialProducts;
-    
-    if (stored) {
-      try {
-        currentList = JSON.parse(stored);
-      } catch (e) {
-        // use default
-      }
-    }
-
+    const currentList = getProductsFromLocalStorage(initialProducts);
     // Prepare complete product object
     const createdItem = {
       ...newProduct,
@@ -32,7 +22,7 @@ export default function AddProduct() {
     };
 
     const updatedList = [createdItem, ...currentList];
-    localStorage.setItem("admin_products", JSON.stringify(updatedList));
+    setProductsToLocalStorage(updatedList);
     navigate("/admin/products");
   };
 

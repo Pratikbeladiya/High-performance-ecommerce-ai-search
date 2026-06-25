@@ -1,4 +1,4 @@
-import React from "react";
+import { useMemo, useCallback } from "react";
 import { Link } from "react-router-dom";
 import {
   AreaChart,
@@ -10,20 +10,20 @@ import {
 } from "recharts";
 import { TrendingUp } from "lucide-react";
 
-export default function AnalyticsCard({ data = [] }) {
-  // Take last 6 months for dashboard preview
-  const previewData = data.slice(-6);
-  
-  // Calculate total sales in preview
-  const totalSales = previewData.reduce((sum, item) => sum + item.sales, 0);
-
-  const formatCurrency = (val) => {
+export default function RevenuePerformanceCard({ data = [] }) {
+  const formatCurrency = useCallback((val) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
       maximumFractionDigits: 0
     }).format(val);
-  };
+  }, []);
+
+  const { previewData, totalSales } = useMemo(() => {
+    const slicedData = data.slice(-6);
+    const sales = slicedData.reduce((sum, item) => sum + item.sales, 0);
+    return { previewData: slicedData, totalSales: sales };
+  }, [data]);
 
   return (
     <div className="glass-panel p-6 rounded-2xl flex flex-col h-full">

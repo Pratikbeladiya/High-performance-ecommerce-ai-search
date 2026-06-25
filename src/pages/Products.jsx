@@ -1,14 +1,20 @@
-import React, { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import PageHeader from "../components/common/PageHeader";
 import ProductFilters from "../components/products/ProductFilters";
-import ProductTable from "../components/products/ProductTable";
+import ProductTable from "../components/products/ProductTable"; // This was already correct
 import { initialProducts } from "../data/products";
-import { Plus, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, ChevronLeft, ChevronRight } from "lucide-react"; // Removed unused PackageSearch
+import { getProductsFromLocalStorage, setProductsToLocalStorage } from "../utils/localStorageHelpers";
 
 export default function Products() {
-  const [products, setProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [products, setProducts] = useState(() => {
+    const storedProducts = getProductsFromLocalStorage(initialProducts);
+    if (!localStorage.getItem("admin_products")) { // Initialize if not present
+      setProductsToLocalStorage(initialProducts);
+    }
+    return storedProducts;
+  });
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
@@ -19,23 +25,24 @@ export default function Products() {
 
   const navigate = useNavigate();
 
-  // Load products on mount
-  useEffect(() => {
-    const stored = localStorage.getItem("admin_products");
-    if (stored) {
-      try {
-        setProducts(JSON.parse(stored));
-      } catch (e) {
-        setProducts(initialProducts);
-      }
-    } else {
-      setProducts(initialProducts);
-      localStorage.setItem("admin_products", JSON.stringify(initialProducts));
-    }
-  }, []);
+  // Wrapped handlers to reset page when search filters change
+  const handleSearchChange = (val) => {
+    setSearchQuery(val);
+    setCurrentPage(1);
+  };
 
-  // Filter products when search query, category, status, or products list changes
-  useEffect(() => {
+  const handleCategoryChange = (val) => {
+    setSelectedCategory(val);
+    setCurrentPage(1);
+  };
+
+  const handleStatusChange = (val) => {
+    setSelectedStatus(val);
+    setCurrentPage(1);
+  };
+
+  // Filter products derived state
+  const filteredProducts = useMemo(() => {
     let result = [...products];
 
     // Search query match
@@ -60,16 +67,18 @@ export default function Products() {
       result = result.filter((p) => p.status === selectedStatus);
     }
 
-    setFilteredProducts(result);
-    setCurrentPage(1); // Reset page to 1 on filter changes
+    return result;
   }, [products, searchQuery, selectedCategory, selectedStatus]);
-
+  
   // Derived category list for dropdown
-  const categories = [...new Set(products.map((p) => p.category))];
-
+  const categories = useMemo(() => {
+    return [...new Set(products.map((p) => p.category))];
+  }, [products]);
+  
   // Paginated products calculation
-  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage) || 1;
+  const activePage = Math.min(currentPage, totalPages);
+  const startIndex = (activePage - 1) * itemsPerPage;
   const paginatedProducts = filteredProducts.slice(startIndex, startIndex + itemsPerPage);
 
   // Edit action
@@ -82,7 +91,7 @@ export default function Products() {
     if (window.confirm("Are you sure you want to delete this product?")) {
       const updated = products.filter((p) => p.id !== id);
       setProducts(updated);
-      localStorage.setItem("admin_products", JSON.stringify(updated));
+      setProductsToLocalStorage(updated);
     }
   };
 
@@ -105,11 +114,11 @@ export default function Products() {
       {/* Filters card */}
       <ProductFilters
         searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
+        setSearchQuery={handleSearchChange}
         selectedCategory={selectedCategory}
-        setSelectedCategory={setSelectedCategory}
+        setSelectedCategory={handleCategoryChange}
         selectedStatus={selectedStatus}
-        setSelectedStatus={setSelectedStatus}
+        setSelectedStatus={handleStatusChange}
         categories={categories}
       />
 
@@ -134,8 +143,8 @@ export default function Products() {
           <div className="flex items-center gap-2">
             {/* Prev button */}
             <button
-              onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-              disabled={currentPage === 1}
+              onClick={() => setCurrentPage(Math.max(activePage - 1, 1))}
+              disabled={activePage === 1}
               className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 disabled:opacity-40 disabled:hover:bg-transparent cursor-pointer"
             >
               <ChevronLeft className="w-5 h-5" />
@@ -147,7 +156,7 @@ export default function Products() {
                 key={page}
                 onClick={() => setCurrentPage(page)}
                 className={`w-7.5 h-7.5 flex items-center justify-center text-xs font-semibold rounded-lg transition-all cursor-pointer ${
-                  currentPage === page
+                  activePage === page
                     ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/10"
                     : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
                 }`}
@@ -158,8 +167,8 @@ export default function Products() {
 
             {/* Next button */}
             <button
-              onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
-              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage(Math.min(activePage + 1, totalPages))}
+              disabled={activePage === totalPages}
               className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 disabled:opacity-40 disabled:hover:bg-transparent cursor-pointer"
             >
               <ChevronRight className="w-5 h-5" />
