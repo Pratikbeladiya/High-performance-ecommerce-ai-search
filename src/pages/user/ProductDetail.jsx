@@ -53,6 +53,10 @@ export default function ProductDetail() {
   const [added, setAdded] = useState(false);
   const [activeImage, setActiveImage] = useState(0);
 
+  // NEW
+  const sizes = ['S', 'M', 'L', 'XL', 'XXL'];
+  const [selectedSize, setSelectedSize] = useState('M');
+
   useEffect(() => {
     try {
       const all = JSON.parse(localStorage.getItem('admin_products') || '[]');
@@ -71,9 +75,20 @@ export default function ProductDetail() {
 
   const handleAddToCart = () => {
     if (!product) return;
-    addToCart(product, quantity);
+
+    addToCart(
+      {
+        ...product,
+        selectedSize,
+      },
+      quantity
+    );
+
     setAdded(true);
-    setTimeout(() => setAdded(false), 2500);
+
+    setTimeout(() => {
+      setAdded(false);
+    }, 2500);
   };
 
   const decrementQty = () => setQuantity((q) => Math.max(1, q - 1));
@@ -149,11 +164,10 @@ export default function ProductDetail() {
                 <button
                   key={i}
                   onClick={() => setActiveImage(i)}
-                  className={`w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${
-                    activeImage === i
-                      ? 'border-indigo-500'
-                      : 'border-slate-700/50 hover:border-slate-500'
-                  }`}
+                  className={`w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${activeImage === i
+                    ? 'border-indigo-500'
+                    : 'border-slate-700/50 hover:border-slate-500'
+                    }`}
                 >
                   <img src={img} alt={`View ${i + 1}`} className="w-full h-full object-cover" />
                 </button>
@@ -183,11 +197,10 @@ export default function ProductDetail() {
               {[1, 2, 3, 4, 5].map((star) => (
                 <Star
                   key={star}
-                  className={`w-4 h-4 ${
-                    star <= Math.round(rating)
-                      ? 'text-amber-400 fill-amber-400'
-                      : 'text-slate-600'
-                  }`}
+                  className={`w-4 h-4 ${star <= Math.round(rating)
+                    ? 'text-amber-400 fill-amber-400'
+                    : 'text-slate-600'
+                    }`}
                 />
               ))}
             </div>
@@ -246,6 +259,39 @@ export default function ProductDetail() {
             </div>
           )}
 
+          {/* Size Selection */}
+
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-slate-300">
+                Select Size
+              </h3>
+
+              <span className="text-indigo-400 text-sm font-medium">
+                Selected : {selectedSize}
+              </span>
+            </div>
+
+            <div className="flex flex-wrap gap-3">
+              {sizes.map((size) => (
+                <button
+                  key={size}
+                  onClick={() => setSelectedSize(size)}
+                  className={`w-12 h-12 rounded-xl border font-semibold transition-all duration-300
+        ${selectedSize === size
+                      ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-500/30 scale-105'
+                      : 'bg-slate-800 border-slate-700 text-slate-300 hover:border-indigo-500 hover:text-white'
+                    }`}
+                >
+                  {size}
+                </button>
+              ))}
+            </div>
+          </div>
+
+
+
+
           {/* Quantity Selector + Add to Cart */}
           {inStock && (
             <div className="flex flex-col sm:flex-row gap-4 pt-2">
@@ -273,11 +319,10 @@ export default function ProductDetail() {
               {/* Add to Cart */}
               <button
                 onClick={handleAddToCart}
-                className={`flex-1 flex items-center justify-center gap-2.5 px-6 py-3 rounded-xl font-semibold text-base transition-all duration-300 ${
-                  added
-                    ? 'bg-emerald-600 text-white scale-95'
-                    : 'bg-indigo-600 hover:bg-indigo-500 text-white hover:shadow-lg hover:shadow-indigo-500/25 hover:-translate-y-0.5'
-                }`}
+                className={`flex-1 flex items-center justify-center gap-2.5 px-6 py-3 rounded-xl font-semibold text-base transition-all duration-300 ${added
+                  ? 'bg-emerald-600 text-white scale-95'
+                  : 'bg-indigo-600 hover:bg-indigo-500 text-white hover:shadow-lg hover:shadow-indigo-500/25 hover:-translate-y-0.5'
+                  }`}
               >
                 {added ? (
                   <>
