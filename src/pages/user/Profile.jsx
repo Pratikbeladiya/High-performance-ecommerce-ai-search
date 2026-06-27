@@ -54,7 +54,23 @@ export default function Profile() {
   }, []);
 
   const totalSpent = orders.reduce((sum, o) => sum + (o.total || 0), 0);
+  const profileFields = [
+  profile.name,
+  profile.email,
+  profile.phone,
+  profile.country,
+  profile.address,
+  profile.city,
+  profile.zip,
+];
 
+const completedFields = profileFields.filter(
+  (field) => field && field.toString().trim() !== ""
+).length;
+
+const profileCompletion = Math.round(
+  (completedFields / profileFields.length) * 100
+);
   const handleChange = (e) => {
     const { name, value } = e.target;
     setProfileState(prev => ({ ...prev, [name]: value }));
@@ -111,6 +127,54 @@ export default function Profile() {
             </div>
           </div>
 
+          {/* Profile Completion */}
+<div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-5">
+  <div className="flex items-center justify-between mb-3">
+    <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">
+      Profile Completion
+    </h3>
+    <span className="text-sm font-bold text-indigo-400">
+      {profileCompletion}%
+    </span>
+  </div>
+
+  <div className="w-full h-3 bg-slate-800 rounded-full overflow-hidden">
+    <div
+      className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full transition-all duration-500"
+      style={{ width: `${profileCompletion}%` }}
+    />
+  </div>
+
+  <p className="text-xs text-slate-500 mt-3">
+    Complete your profile to improve your shopping experience.
+  </p>
+
+  <div className="mt-4 space-y-2">
+    {[
+      { label: "Name", value: profile.name },
+      { label: "Email", value: profile.email },
+      { label: "Phone", value: profile.phone },
+      { label: "Country", value: profile.country },
+      { label: "Address", value: profile.address },
+      { label: "City", value: profile.city },
+      { label: "ZIP Code", value: profile.zip },
+    ].map((item) => (
+      <div
+        key={item.label}
+        className="flex items-center justify-between text-xs"
+      >
+        <span className="text-slate-400">{item.label}</span>
+
+        {item.value ? (
+          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+        ) : (
+          <div className="w-4 h-4 rounded-full border border-slate-600" />
+        )}
+      </div>
+    ))}
+  </div>
+</div>
+          
           {/* Stats */}
           <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 space-y-4">
             <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Account Stats</h3>
