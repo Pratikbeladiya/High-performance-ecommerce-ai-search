@@ -116,16 +116,5 @@ export const DUMMY_PRODUCTS = [
     rating: 4.7,
     reviews: 43,
     description: "Breathable, lightweight chevron knit blanket woven from 100% certified organic long-staple cotton fibers."
-  },
-  {
-    id: 12,
-    name: "IronCore Adjustable Dumbbell Set",
-    category: "Fitness",
-    price: 199.99,
-    image: "https://images.unsplash.com/photo-1638536532686-d610adfc8e5c?auto=format&fit=crop&w=600&q=80",
-    tag: "Heavy",
-    rating: 4.8,
-    reviews: 115,
-    description: "Space-saving design that selector-dials from 5 lbs up to 52.5 lbs instantly with a smooth internal lock system."
   }
 ];
