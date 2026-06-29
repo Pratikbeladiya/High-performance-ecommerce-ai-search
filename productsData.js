@@ -105,16 +105,5 @@ export const DUMMY_PRODUCTS = [
     rating: 4.4,
     reviews: 92,
     description: "Heavy-duty water-repellent canvas featuring a padded 15-inch laptop compartment and magnetic strap closures."
-  },
-  {
-    id: 11,
-    name: "LunaWeave Organic Cotton Throw",
-    category: "Home Living",
-    price: 39.50,
-    image: "https://images.unsplash.com/photo-1580301762395-21ce84d00bc6?auto=format&fit=crop&w=600&q=80",
-    tag: "",
-    rating: 4.7,
-    reviews: 43,
-    description: "Breathable, lightweight chevron knit blanket woven from 100% certified organic long-staple cotton fibers."
   }
 ];
