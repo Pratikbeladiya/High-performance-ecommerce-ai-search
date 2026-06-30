@@ -94,16 +94,5 @@ export const DUMMY_PRODUCTS = [
     rating: 4.6,
     reviews: 340,
     description: "Immersive active noise cancellation with plush memory foam earcups and high-fidelity dynamic sound drivers."
-  },
-  {
-    id: 10,
-    name: "Urban Explorer Canvas Backpack",
-    category: "Apparel",
-    price: 45.00,
-    image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=600&q=80",
-    tag: "",
-    rating: 4.4,
-    reviews: 92,
-    description: "Heavy-duty water-repellent canvas featuring a padded 15-inch laptop compartment and magnetic strap closures."
   }
 ];
