@@ -94,5 +94,60 @@ export const DUMMY_PRODUCTS = [
     rating: 4.6,
     reviews: 340,
     description: "Immersive active noise cancellation with plush memory foam earcups and high-fidelity dynamic sound drivers."
+  },
+  {
+    "id": 10,
+    "name": "Minimalist Leather Backpack",
+    "category": "Apparel & Accessories",
+    "price": 145.00,
+    "image": "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=600&q=80",
+    "tag": "Trending",
+    "rating": 4.6,
+    "reviews": 89,
+    "description": "Crafted from full-grain water-resistant leather. Features a dedicated 15-inch padded laptop sleeve, ergonomic shoulder straps, and a hidden anti-theft back pocket for security."
+  },
+  {
+    "id": 11,
+    "name": "Smart Fitness Watch",
+    "category": "Electronics",
+    "price": 199.50,
+    "image": "https://images.unsplash.com/photo-1579586337278-3befd40fd17a?auto=format&fit=crop&w=600&q=80",
+    "tag": "Sale",
+    "rating": 4.4,
+    "reviews": 215,
+    "description": "Track your daily metrics with an always-on AMOLED display. Includes built-in GPS, advanced heart rate tracking, sleep cycle analysis, and up to 7 days of continuous battery life."
+  },
+  {
+    "id": 12,
+    "name": "Ergonomic Mechanical Keyboard",
+    "category": "Computers",
+    "price": 129.99,
+    "image": "https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=600&q=80",
+    "tag": "New",
+    "rating": 4.9,
+    "reviews": 56,
+    "description": "A split layout design featuring hot-swappable tactile switches, customizable per-key RGB backlighting, and an aluminum top frame. Engineered to reduce typing fatigue."
+  },
+  {
+    "id": 13,
+    "name": "Stainless Steel Espresso Machine",
+    "category": "Home & Kitchen",
+    "price": 549.00,
+    "image": "https://images.unsplash.com/photo-1517256064527-09c53b2d0c6b?auto=format&fit=crop&w=600&q=80",
+    "tag": "Hot",
+    "rating": 4.7,
+    "reviews": 312,
+    "description": "Bring the café experience home with a 15-bar Italian pump pressure system. Includes a commercial-grade steam wand for micro-foam milk texturing and precise PID temperature control."
+  },
+  {
+    "id": 14,
+    "name": "Insulated Hydro Flask (32oz)",
+    "category": "Sports & Outdoors",
+    "price": 42.00,
+    "image": "https://images.unsplash.com/photo-1602143407151-7111542de6e8?auto=format&fit=crop&w=600&q=80",
+    "tag": "Best Seller",
+    "rating": 4.8,
+    "reviews": 1054,
+    "description": "Double-wall vacuum insulation keeps your drinks ice-cold for up to 24 hours or piping hot for 12. Made from durable pro-grade stainless steel with a sweat-free powder coat finish."
   }
 ];
