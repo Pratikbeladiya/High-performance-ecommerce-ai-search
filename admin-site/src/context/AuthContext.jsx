@@ -1,6 +1,9 @@
 import { createContext, useContext, useState, useEffect, useCallback } from "react";
 
 const AuthContext = createContext(null);
+const API_BASE_URL = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
+
+const getApiUrl = (path) => `${API_BASE_URL}${path}`;
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -17,7 +20,7 @@ export function AuthProvider({ children }) {
   // Fetch current profile from backend
   const fetchProfile = useCallback(async (authToken) => {
     try {
-      const res = await fetch("http://localhost:5000/api/auth/profile", {
+      const res = await fetch(getApiUrl("/api/auth/profile"), {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -53,7 +56,7 @@ export function AuthProvider({ children }) {
   const login = async (email, password) => {
     setIsLoading(true);
     try {
-      const res = await fetch("http://localhost:5000/api/auth/login", {
+      const res = await fetch(getApiUrl("/api/auth/login"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -90,7 +93,7 @@ export function AuthProvider({ children }) {
   const register = async (name, email, password) => {
     setIsLoading(true);
     try {
-      const res = await fetch("http://localhost:5000/api/auth/register", {
+      const res = await fetch(getApiUrl("/api/auth/register"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),
@@ -121,7 +124,7 @@ export function AuthProvider({ children }) {
   // Update profile details
   const updateProfile = async (profileData) => {
     try {
-      const res = await fetch("http://localhost:5000/api/auth/profile", {
+      const res = await fetch(getApiUrl("/api/auth/profile"), {
         method: "PUT",
         headers: getHeaders(),
         body: JSON.stringify(profileData),

@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import AdminLayout from "../layouts/AdminLayout";
 import Login from "../pages/Login";
+import Signup from "../pages/Signup";
 import Dashboard from "../pages/Dashboard";
 import Products from "../pages/Products";
 import AddProduct from "../pages/AddProduct";
@@ -16,6 +17,7 @@ export default function AppRoutes() {
 
       {/* Admin Login */}
       <Route path="/admin/login" element={<Login />} />
+      <Route path="/admin/signup" element={<Signup />} />
 
       {/* Protected Admin Routes */}
       <Route path="/admin" element={<AdminLayout />}>
