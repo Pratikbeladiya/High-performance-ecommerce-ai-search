@@ -2,11 +2,24 @@ import mongoose from "mongoose";
 
 const orderItemSchema = new mongoose.Schema({
   product: {
-    id: { type: String, required: true },
-    name: { type: String, required: true },
-    price: { type: Number, required: true },
-    imageUrl: { type: String },
-    category: { type: String },
+    id: { 
+      type: String, 
+      required: true 
+    },
+    name: {
+       type: String, 
+       required: true
+       },
+    price: {
+       type: Number,
+        required: true 
+      },
+    imageUrl: {
+       type: String
+       },
+    category: { 
+      type: String
+     },
   },
   quantity: {
     type: Number,

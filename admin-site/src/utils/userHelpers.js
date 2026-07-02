@@ -44,10 +44,6 @@ export const getOrders = async (token) => {
 };
 
 export const addOrder = async (order, token) => {
-  const localOrders = JSON.parse(localStorage.getItem("user_orders") || "[]");
-  localOrders.unshift(order);
-  localStorage.setItem("user_orders", JSON.stringify(localOrders));
-
   try {
     const headers = { "Content-Type": "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
@@ -57,11 +53,25 @@ export const addOrder = async (order, token) => {
       headers,
       body: JSON.stringify(order),
     });
-    if (!res.ok) console.warn("Failed to sync order with backend database");
+    
+    if (!res.ok) {
+      throw new Error("Failed to save order to database");
+    }
+    
+    // Also save to localStorage for offline fallback
+    const localOrders = JSON.parse(localStorage.getItem("user_orders") || "[]");
+    localOrders.unshift(order);
+    localStorage.setItem("user_orders", JSON.stringify(localOrders));
+    
+    return localOrders;
   } catch (err) {
-    console.error("Backend order sync failed:", err.message);
+    console.error("Failed to save order to API:", err.message);
+    // Fall back to localStorage only
+    const localOrders = JSON.parse(localStorage.getItem("user_orders") || "[]");
+    localOrders.unshift(order);
+    localStorage.setItem("user_orders", JSON.stringify(localOrders));
+    return localOrders;
   }
-  return localOrders;
 };
 
 // ─── Profile Helpers ──────────────────────────────────────────

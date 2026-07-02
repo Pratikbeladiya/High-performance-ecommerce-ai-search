@@ -1,5 +1,6 @@
 import Order from "../models/Order.js";
 import Product from "../models/Product.js";
+import Cart from "../models/Cart.js";
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -36,6 +37,17 @@ export const createOrder = async (req, res) => {
     // If request contains authorization header (user is logged in)
     if (req.user) {
       order.user = req.user._id;
+      
+      // Clear user's cart after order creation
+      try {
+        await Cart.findOneAndUpdate(
+          { user: req.user._id },
+          { items: [] },
+          { new: true }
+        );
+      } catch (err) {
+        console.error("Error clearing cart after order:", err);
+      }
     }
 
     const createdOrder = await order.save();

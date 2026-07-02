@@ -18,6 +18,7 @@ export default function Sidebar({ isOpen, onClose }) {
 
   const handleLogout = () => {
     logout();
+    // Clear any legacy localStorage items
     localStorage.removeItem("admin_auth");
     localStorage.removeItem("admin_user");
     navigate("/admin/login");
