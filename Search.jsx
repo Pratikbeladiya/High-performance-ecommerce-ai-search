@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { DUMMY_PRODUCTS } from './productsData';
-
 export default function Search({ defaultQuery, setView, setSelectedProduct, addToCart }) {
   const [searchQuery, setSearchQuery] = useState(defaultQuery || '');
   const [submittedQuery, setSubmittedQuery] = useState(defaultQuery || '');
@@ -82,3 +81,9 @@ export default function Search({ defaultQuery, setView, setSelectedProduct, addT
     </main>
   );
 }
+
+
+
+
+
+
