@@ -6,12 +6,10 @@ import Search from './Search';
 import Cart from './Cart';
 
 export default function App() {
-  const [view, setView] = useState('home'); // Accepts: 'home' | 'shop' | 'details' | 'search' | 'cart'
+  const [view, setView] = useState('home');
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [cart, setCart] = useState([]);
-
-  // Global State Cart Actions
   const addToCart = (product, qty = 1) => {
     setCart((prevCart) => {
       const existing = prevCart.find(item => item.id === product.id);
@@ -43,7 +41,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">
-      {/* Global Navigation Wrapper */}
       <nav className="bg-white border-b border-slate-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
@@ -70,8 +67,6 @@ export default function App() {
           </div>
         </div>
       </nav>
-
-      {/* Dynamic Render Pipeline */}
       <div className="flex-grow flex flex-col">
         {view === 'home' && (
           <Home 
@@ -112,8 +107,6 @@ export default function App() {
           />
         )}
       </div>
-
-      {/* Global Footer Layout */}
       <footer className="bg-slate-900 text-slate-400 text-sm mt-auto border-t border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center text-xs text-slate-500">
           &copy; 2026 ShopSphere Inc. Powered via modular React component structures.
