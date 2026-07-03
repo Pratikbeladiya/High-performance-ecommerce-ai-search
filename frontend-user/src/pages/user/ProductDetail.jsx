@@ -37,7 +37,7 @@ function RelatedCard({ product }) {
         <p className="text-slate-200 text-sm font-medium truncate group-hover:text-indigo-400 transition-colors">
           {product.name}
         </p>
-        <p className="text-indigo-400 font-bold mt-1">${parseFloat(product.price).toFixed(2)}</p>
+        <p className="text-indigo-400 font-bold mt-1">₹{parseFloat(product.price).toFixed(2)}</p>
       </div>
     </Link>
   );
@@ -216,11 +216,11 @@ export default function ProductDetail() {
           {/* Price */}
           <div className="flex items-end gap-3">
             <span className="text-4xl font-black text-white">
-              ${parseFloat(product.price || 0).toFixed(2)}
+              ₹{parseFloat(product.price || 0).toFixed(2)}
             </span>
             {product.originalPrice && parseFloat(product.originalPrice) > parseFloat(product.price) && (
               <span className="text-slate-500 line-through text-xl mb-1">
-                ${parseFloat(product.originalPrice).toFixed(2)}
+                ₹{parseFloat(product.originalPrice).toFixed(2)}
               </span>
             )}
           </div>

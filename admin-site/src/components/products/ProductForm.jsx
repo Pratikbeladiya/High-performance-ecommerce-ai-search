@@ -138,7 +138,7 @@ export default function ProductForm({
               {/* Price */}
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-slate-300 block">
-                  PRICE (USD)
+                  PRICE (INR)
                 </label>
                 <input
                   type="number"

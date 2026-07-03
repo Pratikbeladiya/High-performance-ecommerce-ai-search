@@ -73,7 +73,7 @@ export default function TraditionalSearch({
                       {product.name}
                     </h4>
                     <span className="text-[10px] font-bold text-indigo-400">
-                      ${product.price}
+                      ₹{product.price}
                     </span>
                   </div>
                   <span className="text-[9px] text-slate-500 font-semibold mt-1 inline-block uppercase">

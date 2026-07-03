@@ -23,7 +23,7 @@ export default function Products() {
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/products");
+      const res = await fetch("/api/products");
       if (!res.ok) throw new Error("Failed to load products");
       const data = await res.json();
       setProducts(data.map(p => ({ ...p, id: p._id })));
@@ -102,7 +102,7 @@ export default function Products() {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
       try {
-        const res = await fetch(`http://localhost:5000/api/products/${id}`, {
+        const res = await fetch(`/api/products/${id}`, {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`,

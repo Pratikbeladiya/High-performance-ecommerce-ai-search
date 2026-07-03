@@ -414,7 +414,7 @@ export default function Checkout() {
               className="w-full flex items-center justify-center gap-3 py-4 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-bold text-lg rounded-2xl transition-all duration-300 hover:shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-0.5"
             >
               <Lock className="w-5 h-5" />
-              Place Order — ${TOTAL.toFixed(2)}
+              Place Order — ₹{TOTAL.toFixed(2)}
             </button>
           </form>
 
@@ -447,7 +447,7 @@ export default function Checkout() {
                       <p className="text-slate-500 text-xs">Qty: {item.quantity}</p>
                     </div>
                     <span className="text-slate-200 text-sm font-semibold flex-shrink-0">
-                      ${(item.product.price * item.quantity).toFixed(2)}
+                      ₹{(item.product.price * item.quantity).toFixed(2)}
                     </span>
                   </div>
                 ))}
@@ -457,28 +457,28 @@ export default function Checkout() {
               <div className="border-t border-slate-700/50 pt-4 space-y-2.5">
                 <div className="flex justify-between text-sm">
                   <span className="text-slate-400">Subtotal</span>
-                  <span className="text-slate-200">${cartTotal.toFixed(2)}</span>
+                  <span className="text-slate-200">₹{cartTotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-slate-400">Shipping</span>
                   <span className={SHIPPING === 0 ? 'text-emerald-400' : 'text-slate-200'}>
-                    {SHIPPING === 0 ? 'FREE' : `$${SHIPPING.toFixed(2)}`}
+                    {SHIPPING === 0 ? 'FREE' : `₹${SHIPPING.toFixed(2)}`}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-slate-400">Tax (8%)</span>
-                  <span className="text-slate-200">${TAX.toFixed(2)}</span>
+                  <span className="text-slate-200">₹{TAX.toFixed(2)}</span>
                 </div>
 
                 {cartTotal > 100 && (
                   <div className="text-xs text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-3 py-1.5">
-                    🎉 Free shipping on orders over $100!
+                    🎉 Free shipping on orders over ₹100!
                   </div>
                 )}
 
                 <div className="border-t border-slate-700/50 pt-3 flex justify-between">
                   <span className="text-slate-200 font-semibold">Total</span>
-                  <span className="text-white font-black text-lg">${TOTAL.toFixed(2)}</span>
+                  <span className="text-white font-black text-lg">₹{TOTAL.toFixed(2)}</span>
                 </div>
               </div>
             </div>

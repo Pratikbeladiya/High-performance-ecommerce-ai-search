@@ -1,25 +1,30 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PageHeader from "../components/common/PageHeader";
 import SalesChart from "../components/analytics/SalesChart";
 import CategoryChart from "../components/analytics/CategoryChart";
 import InventoryChart from "../components/analytics/InventoryChart";
 import { salesTrends, categoryDistribution } from "../data/analytics";
-import { initialProducts } from "../data/products";
 import { Zap, RefreshCw } from "lucide-react";
 
 export default function Analytics() {
-  const [products] = useState(() => {
-    const stored = localStorage.getItem("admin_products");
-    if (stored) {
-      try {
-        return JSON.parse(stored);
-      } catch {
-        return initialProducts;
-      }
-    }
-    return initialProducts;
-  });
+  const [products, setProducts] = useState([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch("/api/products?isAdmin=true");
+        if (!res.ok) throw new Error("Failed to load products");
+        const data = await res.json();
+        setProducts(data.map((p) => ({ ...p, id: p._id })));
+      } catch (err) {
+        console.error(err);
+        setProducts([]);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   const handleRefreshData = () => {
     setIsRefreshing(true);

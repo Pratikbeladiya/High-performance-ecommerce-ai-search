@@ -2,7 +2,6 @@ import { createContext, useContext, useState, useEffect, useCallback } from "rea
 
 const AuthContext = createContext(null);
 const API_BASE_URL = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
-
 const getApiUrl = (path) => `${API_BASE_URL}${path}`;
 
 export function AuthProvider({ children }) {
@@ -10,14 +9,11 @@ export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => localStorage.getItem("user_token"));
   const [isLoading, setIsLoading] = useState(true);
 
-  const getHeaders = useCallback(() => {
-    return {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    };
-  }, [token]);
+  const getHeaders = useCallback(() => ({
+    "Content-Type": "application/json",
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  }), [token]);
 
-  // Fetch current profile from backend
   const fetchProfile = useCallback(async (authToken) => {
     try {
       const res = await fetch(getApiUrl("/api/auth/profile"), {

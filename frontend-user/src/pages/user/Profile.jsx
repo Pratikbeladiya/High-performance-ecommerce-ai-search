@@ -154,7 +154,7 @@ export default function Profile() {
             <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Account Stats</h3>
             {[
               { icon: Package, label: "Total Orders", value: orders.length, color: "text-indigo-400" },
-              { icon: Star, label: "Total Spent", value: new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(totalSpent), color: "text-amber-400" },
+              { icon: Star, label: "Total Spent", value: new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format(totalSpent), color: "text-amber-400" },
               { icon: CheckCircle2, label: "Delivered", value: orders.filter(o => o.status === "Delivered").length, color: "text-emerald-400" },
             ].map(({ icon: Icon, label, value, color }) => (
               <div key={label} className="flex items-center justify-between">
@@ -185,7 +185,7 @@ export default function Profile() {
                     </div>
                     <div className="text-right">
                       <p className="text-xs font-bold text-white">
-                        {new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(order.total || 0)}
+                        {new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format(order.total || 0)}
                       </p>
                       <span className={`text-[10px] font-semibold ${
                         order.status === "Delivered" ? "text-emerald-400" :

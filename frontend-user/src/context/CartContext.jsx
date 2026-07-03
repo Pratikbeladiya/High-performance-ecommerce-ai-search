@@ -2,21 +2,26 @@ import { createContext, useContext, useState, useEffect, useCallback } from "rea
 import { useAuth } from "./AuthContext";
 
 const CartContext = createContext(null);
-
 const CART_KEY = "user_cart";
+const API_BASE_URL = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
+const getApiUrl = (path) => `${API_BASE_URL}${path}`;
 
 function loadCart() {
   try {
     const stored = localStorage.getItem(CART_KEY);
     if (stored) return JSON.parse(stored);
-  } catch { /* ignore */ }
+  } catch {
+    // ignore invalid JSON
+  }
   return [];
 }
 
 function saveCart(cart) {
   try {
     localStorage.setItem(CART_KEY, JSON.stringify(cart));
-  } catch { /* ignore */ }
+  } catch {
+    // ignore storage errors
+  }
 }
 
 /**
@@ -34,7 +39,7 @@ export function CartProvider({ children }) {
     
     try {
       setIsLoading(true);
-      const res = await fetch("http://localhost:5000/api/cart", {
+      const res = await fetch(getApiUrl("/api/cart"), {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -80,7 +85,7 @@ export function CartProvider({ children }) {
       if (token) {
         // Use API for authenticated users
         try {
-          const res = await fetch("http://localhost:5000/api/cart/items", {
+          const res = await fetch(getApiUrl("/api/cart/items"), {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -131,15 +136,12 @@ export function CartProvider({ children }) {
       if (token) {
         // Use API for authenticated users
         try {
-          const res = await fetch(
-            `http://localhost:5000/api/cart/items/${productId}`,
-            {
-              method: "DELETE",
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
+          const res = await fetch(getApiUrl(`/api/cart/items/${productId}`), {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
 
           if (res.ok) {
             const cartData = await res.json();
@@ -163,7 +165,7 @@ export function CartProvider({ children }) {
     [token]
   );
 
-  const updateQty = useCallback(
+  const updateQuantity = useCallback(
     async (productId, quantity) => {
       if (quantity <= 0) {
         removeFromCart(productId);
@@ -173,17 +175,14 @@ export function CartProvider({ children }) {
       if (token) {
         // Use API for authenticated users
         try {
-          const res = await fetch(
-            `http://localhost:5000/api/cart/items/${productId}`,
-            {
-              method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
-              body: JSON.stringify({ quantity }),
-            }
-          );
+          const res = await fetch(getApiUrl(`/api/cart/items/${productId}`), {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ quantity }),
+          });
 
           if (res.ok) {
             const cartData = await res.json();
@@ -211,14 +210,11 @@ export function CartProvider({ children }) {
     [token, removeFromCart]
   );
 
-  // Legacy alias for updateQuantity
-  const updateQuantity = updateQty;
-
   const clearCart = useCallback(async () => {
     if (token) {
       // Use API for authenticated users
       try {
-        await fetch("http://localhost:5000/api/cart", {
+        await fetch(getApiUrl("/api/cart"), {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -236,15 +232,10 @@ export function CartProvider({ children }) {
   }, [token]);
 
   const count = cart.reduce((sum, item) => sum + item.quantity, 0);
-  // Legacy alias
-  const cartCount = count;
-
-  const total = cart.reduce(
+  const cartTotal = cart.reduce(
     (sum, item) => sum + (item.product?.price || 0) * item.quantity,
     0
   );
-  // Legacy alias
-  const cartTotal = total;
 
   const isInCart = useCallback(
     (productId) => cart.some((item) => item.product.id === productId),
@@ -259,13 +250,10 @@ export function CartProvider({ children }) {
         setCartOpen,
         addToCart,
         removeFromCart,
-        updateQty,
         updateQuantity,
         clearCart,
         isInCart,
         count,
-        cartCount,
-        total,
         cartTotal,
         isLoading,
       }}

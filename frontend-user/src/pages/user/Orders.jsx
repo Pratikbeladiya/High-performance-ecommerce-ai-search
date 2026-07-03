@@ -80,7 +80,7 @@ function OrderCard({ order }) {
   };
 
   const formatCurrency = (val) =>
-    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(val || 0);
+    new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format(val || 0);
 
   return (
     <div className="bg-slate-900/60 border border-slate-800 rounded-2xl overflow-hidden">
@@ -151,7 +151,7 @@ function OrderCard({ order }) {
                   <p className="text-xs text-slate-500">Qty: {item.quantity}</p>
                 </div>
                 <div className="text-sm font-bold text-white whitespace-nowrap">
-                  {new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format((item.product?.price || 0) * item.quantity)}
+                  {new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format((item.product?.price || 0) * item.quantity)}
                 </div>
               </div>
             ))}
@@ -194,7 +194,7 @@ export default function Orders() {
             <span className="text-slate-300">My Orders</span>
           </div>
           <h1 className="text-3xl font-black text-white">My Orders</h1>
-          <p className="text-slate-400 text-sm mt-1">{orders.length} orders · {new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(totalSpent)} total spent</p>
+          <p className="text-slate-400 text-sm mt-1">{orders.length} orders · {new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format(totalSpent)} total spent</p>
         </div>
         <button
           onClick={() => navigate("/catalog")}
@@ -209,7 +209,7 @@ export default function Orders() {
         <div className="grid grid-cols-3 gap-4 mb-8">
           {[
             { label: "Total Orders", value: orders.length, icon: Package, color: "text-indigo-400" },
-            { label: "Total Spent", value: new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(totalSpent), icon: Star, color: "text-amber-400" },
+            { label: "Total Spent", value: new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format(totalSpent), icon: Star, color: "text-amber-400" },
             { label: "Delivered", value: orders.filter(o => o.status === "Delivered").length, icon: CheckCircle2, color: "text-emerald-400" },
           ].map(({ label, value, icon: Icon, color }) => (
             <div key={label} className="text-center p-4 bg-slate-900/50 border border-slate-800 rounded-2xl">

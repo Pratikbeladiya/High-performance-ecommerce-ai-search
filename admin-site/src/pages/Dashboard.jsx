@@ -1,9 +1,8 @@
-import { useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import PageHeader from "../components/common/PageHeader";
 import StatsCard from "../components/dashboard/StatsCard";
 import InventoryCard from "../components/dashboard/InventoryCard";
 import AnalyticsCard from "../components/dashboard/AnalyticsCard";
-import { initialProducts } from "../data/products";
 import { salesTrends, recentActivities } from "../data/analytics";
 import {
   Package,
@@ -15,19 +14,23 @@ import {
 import { Link } from "react-router-dom";
 
 export default function Dashboard() {
-  const [products] = useState(() => {
-    // Read products from localStorage first to capture any additions/edits
-    const stored = localStorage.getItem("admin_products");
-    if (stored) {
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
       try {
-        return JSON.parse(stored);
-      } catch {
-        // use default
+        const res = await fetch("/api/products?isAdmin=true");
+        if (!res.ok) throw new Error("Failed to load products");
+        const data = await res.json();
+        setProducts(data.map((p) => ({ ...p, id: p._id })));
+      } catch (err) {
+        console.error(err);
+        setProducts([]);
       }
-    }
-    localStorage.setItem("admin_products", JSON.stringify(initialProducts));
-    return initialProducts;
-  });
+    };
+
+    fetchProducts();
+  }, []);
 
   const stats = useMemo(() => {
     // Compute stats dynamically

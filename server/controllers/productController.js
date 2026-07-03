@@ -1,17 +1,15 @@
 import Product from "../models/Product.js";
 
+const getStatus = (stock = 0) =>
+  stock > 5 ? "In Stock" : stock > 0 ? "Low Stock" : "Out of Stock";
+
 // @desc    Fetch all products
 // @route   GET /api/products
 // @access  Public
 export const getProducts = async (req, res) => {
   try {
-    const { isAdmin } = req.query; // Send from admin panel to see invisible products
-    
-    let filter = {};
-    if (isAdmin !== "true") {
-      filter = { isVisible: true };
-    }
-
+    const { isAdmin } = req.query;
+    const filter = isAdmin === "true" ? {} : { isVisible: true };
     const products = await Product.find(filter).sort({ createdAt: -1 });
     res.json(products);
   } catch (error) {
@@ -25,7 +23,6 @@ export const getProducts = async (req, res) => {
 export const getProductById = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
-
     if (product) {
       res.json(product);
     } else {
@@ -41,19 +38,29 @@ export const getProductById = async (req, res) => {
 // @access  Private/Admin
 export const createProduct = async (req, res) => {
   try {
-    const { name, price, description, category, imageUrl, stock, tags, aiEmbeddingsContext, isVisible } = req.body;
+    const {
+      name,
+      price,
+      description,
+      category,
+      imageUrl = "",
+      stock = 0,
+      tags = [],
+      aiEmbeddingsContext = "",
+      isVisible = true,
+    } = req.body;
 
     const product = new Product({
       name,
       price,
       description,
       category,
-      imageUrl: imageUrl || "",
-      stock: stock || 0,
-      tags: tags || [],
-      aiEmbeddingsContext: aiEmbeddingsContext || "",
-      isVisible: isVisible !== undefined ? isVisible : true,
-      status: stock > 5 ? "In Stock" : stock > 0 ? "Low Stock" : "Out of Stock"
+      imageUrl,
+      stock,
+      tags,
+      aiEmbeddingsContext,
+      isVisible,
+      status: getStatus(stock),
     });
 
     const createdProduct = await product.save();
@@ -68,29 +75,45 @@ export const createProduct = async (req, res) => {
 // @access  Private/Admin
 export const updateProduct = async (req, res) => {
   try {
-    const { name, price, description, category, imageUrl, stock, tags, aiEmbeddingsContext, isVisible } = req.body;
-
     const product = await Product.findById(req.params.id);
 
-    if (product) {
-      product.name = name || product.name;
-      product.price = price !== undefined ? price : product.price;
-      product.description = description || product.description;
-      product.category = category || product.category;
-      product.imageUrl = imageUrl !== undefined ? imageUrl : product.imageUrl;
-      product.stock = stock !== undefined ? stock : product.stock;
-      product.tags = tags || product.tags;
-      product.aiEmbeddingsContext = aiEmbeddingsContext !== undefined ? aiEmbeddingsContext : product.aiEmbeddingsContext;
-      product.isVisible = isVisible !== undefined ? isVisible : product.isVisible;
-      
-      // Update status dynamically
-      product.status = product.stock > 5 ? "In Stock" : product.stock > 0 ? "Low Stock" : "Out of Stock";
-
-      const updatedProduct = await product.save();
-      res.json(updatedProduct);
-    } else {
-      res.status(404).json({ message: "Product not found" });
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
     }
+
+    const {
+      name,
+      price,
+      description,
+      category,
+      imageUrl,
+      stock,
+      tags,
+      aiEmbeddingsContext,
+      isVisible,
+    } = req.body;
+
+    const fields = {
+      name,
+      price,
+      description,
+      category,
+      imageUrl,
+      stock,
+      tags,
+      aiEmbeddingsContext,
+      isVisible,
+    };
+
+    Object.entries(fields).forEach(([key, value]) => {
+      if (value !== undefined) {
+        product[key] = value;
+      }
+    });
+
+    product.status = getStatus(product.stock);
+    const updatedProduct = await product.save();
+    res.json(updatedProduct);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -102,13 +125,11 @@ export const updateProduct = async (req, res) => {
 export const deleteProduct = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
-
-    if (product) {
-      await Product.findByIdAndDelete(req.params.id);
-      res.json({ message: "Product removed successfully" });
-    } else {
-      res.status(404).json({ message: "Product not found" });
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
     }
+    await Product.findByIdAndDelete(req.params.id);
+    res.json({ message: "Product removed successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

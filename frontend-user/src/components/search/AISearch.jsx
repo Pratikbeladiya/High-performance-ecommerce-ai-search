@@ -73,7 +73,7 @@ export default function AISearch({
                         {item.name}
                       </h4>
                       <span className="text-[10px] font-bold text-cyan-400">
-                        ${item.price}
+                        ₹{item.price}
                       </span>
                     </div>
                     <span className="text-[9px] text-slate-500 font-semibold mt-1 inline-block uppercase">

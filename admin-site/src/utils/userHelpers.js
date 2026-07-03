@@ -31,7 +31,7 @@ export const getOrders = async (token) => {
     try { return JSON.parse(localStorage.getItem("user_orders") || "[]"); } catch { return []; }
   }
   try {
-    const res = await fetch("http://localhost:5000/api/orders/myorders", {
+    const res = await fetch("/api/orders/myorders", {
       headers: { Authorization: `Bearer ${token}` }
     });
     if (!res.ok) throw new Error();
@@ -48,7 +48,7 @@ export const addOrder = async (order, token) => {
     const headers = { "Content-Type": "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
-    const res = await fetch("http://localhost:5000/api/orders", {
+    const res = await fetch("/api/orders", {
       method: "POST",
       headers,
       body: JSON.stringify(order),
@@ -93,7 +93,7 @@ export const setProfile = (profile) => localStorage.setItem("user_profile", JSON
  */
 export async function getPublicProducts() {
   try {
-    const res = await fetch("http://localhost:5000/api/products");
+    const res = await fetch("/api/products");
     if (!res.ok) throw new Error();
     const data = await res.json();
     return data.map(p => ({ ...p, id: p._id }));
@@ -119,7 +119,7 @@ export async function getPublicProducts() {
  */
 export async function getProductById(id) {
   try {
-    const res = await fetch(`http://localhost:5000/api/products/${id}`);
+    const res = await fetch(`/api/products/${id}`);
     if (!res.ok) throw new Error();
     const data = await res.json();
     return { ...data, id: data._id };
@@ -226,12 +226,12 @@ export function computeAIRelevance(product, query) {
 }
 
 /**
- * Format price as USD currency string.
+ * Format price as INR currency string.
  */
 export function formatPrice(value) {
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat("en-IN", {
     style: "currency",
-    currency: "USD",
+    currency: "INR",
     minimumFractionDigits: 2,
   }).format(value);
 }
