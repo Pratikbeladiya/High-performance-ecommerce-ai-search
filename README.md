@@ -48,7 +48,6 @@ Administrators can manage products, categories, users, orders, sales analytics, 
 - User Profile
 - Address Management
 - Responsive Design
-- Dark UI
 - Product Reviews
 - Search Suggestions
 
@@ -78,7 +77,7 @@ Administrators can manage products, categories, users, orders, sales analytics, 
 - MongoDB Database
 - Express.js Server
 - JWT Authentication
-- Password Encryption
+- Password Encryption with bcrypt.js
 - CRUD Operations
 - Product APIs
 - User APIs
@@ -88,7 +87,7 @@ Administrators can manage products, categories, users, orders, sales analytics, 
 - Error Handling
 - Middleware
 - Environment Variables
-- Health Check Endpoint
+- verification of Endpoint to work correct or not
 
 ---
 
@@ -98,8 +97,9 @@ Administrators can manage products, categories, users, orders, sales analytics, 
 
 - React.js
 - Vite
+- Javascript
+- HTML5
 - Tailwind CSS
-- React Router DOM
 - Axios
 
 ## Backend
@@ -107,10 +107,9 @@ Administrators can manage products, categories, users, orders, sales analytics, 
 - Node.js
 - Express.js
 - MongoDB
-- Mongoose
-- JWT
-- Bcrypt
-- Dotenv
+- JWT -Authentication
+- Bcrypt -Password Hashing
+- Dotenv -Hide Credentials
 
 ---
 
@@ -120,9 +119,9 @@ Administrators can manage products, categories, users, orders, sales analytics, 
 VectorCommerce/
 
 │
-├── client-user/        # Customer Storefront
+├── frontend-user/        # Customer Storefront
 │
-├── client-admin/       # Admin Dashboard
+├── admin-site/       # Admin Dashboard
 │
 ├── server/             # Express Backend
 │
@@ -286,7 +285,7 @@ password123
 
 ---
 
-# 📸 Project Screenshots
+<!-- # 📸 Project Screenshots
 
 ## Customer Store
 
@@ -299,7 +298,7 @@ password123
 /screenshots/profile.png
 ```
 
----
+--- -->
 
 ## Admin Dashboard
 
@@ -325,8 +324,6 @@ password123
 ✅ Category Management
 
 ✅ Shopping Cart
-
-✅ Wishlist
 
 ✅ Orders
 
