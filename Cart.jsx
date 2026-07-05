@@ -1,29 +1,51 @@
 import React from 'react';
 
 export default function Cart({ cart, updateQuantity, removeFromCart, setView }) {
-  const subtotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+  // Calculate total price dynamically
+  const subtotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+
+  // Handle quantity changes cleanly, preventing 0 or negative items
+  const handleQuantityChange = (id, currentQuantity, newQuantity) => {
+    if (newQuantity <= 0) {
+      removeFromCart(id);
+    } else {
+      updateQuantity(id, newQuantity);
+    }
+  };
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-grow w-full">
       <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-8">Shopping Cart</h1>
 
       {cart.length === 0 ? (
+        /* Empty Cart State */
         <div className="bg-white border border-slate-200 rounded-xl p-12 text-center shadow-sm">
-          <i className="fa-solid fa-basket-shopping text-slate-300 text-5xl mb-4"></i>
+          <i className="fa-solid fa-basket-shopping text-slate-300 text-5xl mb-4" aria-hidden="true"></i>
           <p className="text-slate-500 font-medium mb-4">Your shopping cart is currently completely empty.</p>
-          <button onClick={() => setView('shop')} className="bg-indigo-600 text-white font-semibold px-6 py-2 rounded-xl text-sm transition hover:bg-indigo-700">
+          <button 
+            onClick={() => setView('shop')} 
+            className="bg-indigo-600 text-white font-semibold px-6 py-2 rounded-xl text-sm transition hover:bg-indigo-700 cursor-pointer"
+          >
             Start Shopping
           </button>
         </div>
       ) : (
+        /* Active Cart State */
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-          {/* Cart Item Cards Block Column */}
+          
+          {/* Cart Item Cards Column */}
           <div className="lg:col-span-2 space-y-4">
             {cart.map((item) => (
-              <div key={item.id} className="bg-white border border-slate-200 rounded-xl p-4 sm:p-6 flex items-center gap-4 sm:gap-6 relative">
+              <div 
+                key={item.id} 
+                className="bg-white border border-slate-200 rounded-xl p-4 sm:p-6 flex items-center gap-4 sm:gap-6 relative shadow-sm"
+              >
+                {/* Product Image */}
                 <div className="w-20 h-20 sm:w-24 sm:h-24 bg-slate-100 rounded-lg overflow-hidden flex-shrink-0 border border-slate-200">
                   <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                 </div>
+
+                {/* Item Details & Controls */}
                 <div className="flex-grow flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
                     <h3 className="font-bold text-slate-800 text-base sm:text-lg line-clamp-1">{item.name}</h3>
@@ -31,28 +53,33 @@ export default function Cart({ cart, updateQuantity, removeFromCart, setView }) 
                     <p className="text-sm font-extrabold text-indigo-600 mt-2">${item.price.toFixed(2)}</p>
                   </div>
                   
-                  {/* Item Quantities Controller Container */}
+                  {/* Item Quantities Controller */}
                   <div className="flex items-center gap-6 self-start sm:self-auto">
                     <div className="bg-slate-100 border border-slate-200 rounded-lg flex items-center justify-between p-1 w-28">
                       <button 
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                        className="w-7 h-7 flex items-center justify-center font-bold text-slate-500 hover:bg-white rounded transition"
+                        onClick={() => handleQuantityChange(item.id, item.quantity, item.quantity - 1)}
+                        className="w-7 h-7 flex items-center justify-center font-bold text-slate-500 hover:bg-white rounded transition cursor-pointer"
+                        aria-label={`Decrease quantity of ${item.name}`}
                       >
                         -
                       </button>
-                      <span className="text-xs font-bold text-slate-800">{item.quantity}</span>
+                      <span className="text-xs font-bold text-slate-800" aria-live="polite">{item.quantity}</span>
                       <button 
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                        className="w-7 h-7 flex items-center justify-center font-bold text-slate-500 hover:bg-white rounded transition"
+                        onClick={() => handleQuantityChange(item.id, item.quantity, item.quantity + 1)}
+                        className="w-7 h-7 flex items-center justify-center font-bold text-slate-500 hover:bg-white rounded transition cursor-pointer"
+                        aria-label={`Increase quantity of ${item.name}`}
                       >
                         +
                       </button>
                     </div>
+                    
+                    {/* Delete button */}
                     <button 
                       onClick={() => removeFromCart(item.id)}
                       className="text-slate-400 hover:text-rose-500 text-sm transition cursor-pointer"
+                      aria-label={`Remove ${item.name} from cart`}
                     >
-                      <i className="fa-regular fa-trash-can"></i>
+                      <i className="fa-regular fa-trash-can" aria-hidden="true"></i>
                     </button>
                   </div>
                 </div>
@@ -62,7 +89,7 @@ export default function Cart({ cart, updateQuantity, removeFromCart, setView }) 
 
           {/* Pricing Summary Sidebar Breakdown Panel */}
           <aside className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm sticky top-24">
-            <h3 className="text-lg font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Order Summary</h3>
+            <h2 className="text-lg font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Order Summary</h2>
             
             <div className="space-y-3 text-sm font-medium mb-6">
               <div className="flex justify-between text-slate-500">
@@ -84,13 +111,17 @@ export default function Cart({ cart, updateQuantity, removeFromCart, setView }) 
               </div>
             </div>
 
-            <button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-4 rounded-xl text-center transition block cursor-pointer">
+            <button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-4 rounded-xl text-center transition block cursor-pointer shadow-sm hover:shadow-md">
               Proceed to Checkout
             </button>
-            <button onClick={() => setView('shop')} className="w-full text-center text-xs font-bold text-slate-400 hover:text-indigo-600 mt-4 block transition cursor-pointer">
+            <button 
+              onClick={() => setView('shop')} 
+              className="w-full text-center text-xs font-bold text-slate-400 hover:text-indigo-600 mt-4 block transition cursor-pointer"
+            >
               Continue Shopping
             </button>
           </aside>
+
         </div>
       )}
     </main>
