@@ -19,7 +19,16 @@ export default function ProductForm({
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const categories = ["Electronics", "Home & Living", "Apparel"];
+  const categories = [
+    "Electronics",
+    "Home & Living",
+    "Apparel",
+    "Beauty & Personal Care",
+    "Sports & Outdoors",
+    "Books & Stationery",
+    "Automotive",
+    "Groceries"
+  ];
 
   const validate = () => {
     const tempErrors = {};

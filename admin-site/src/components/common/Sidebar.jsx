@@ -7,7 +7,8 @@ import {
   SearchCode,
   LogOut,
   Terminal,
-  X
+  X,
+  User
 } from "lucide-react";
 
 import { useAuth } from "../../context/AuthContext";
@@ -29,7 +30,8 @@ export default function Sidebar({ isOpen, onClose }) {
     { name: "Products", path: "/admin/products", icon: ShoppingBag },
     { name: "Add Product", path: "/admin/add-product", icon: PlusCircle },
     { name: "Analytics", path: "/admin/analytics", icon: BarChart3 },
-    { name: "Search Testing", path: "/admin/search-testing", icon: SearchCode }
+    { name: "Search Testing", path: "/admin/search-testing", icon: SearchCode },
+    { name: "My Profile", path: "/admin/profile", icon: User }
   ];
 
   return (

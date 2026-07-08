@@ -3,12 +3,14 @@ import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./config/db.js";
 import User from "./models/User.js";
+import Activity from "./models/Activity.js";
 
 // Routes imports
 import authRoutes from "./routes/authRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
+import activityRoutes from "./routes/activityRoutes.js";
 
 // Load env vars
 dotenv.config();
@@ -34,10 +36,54 @@ const ensureDefaultAdmin = async () => {
   }
 };
 
+const seedDefaultActivities = async () => {
+  try {
+    const count = await Activity.countDocuments();
+    if (count === 0) {
+      await Activity.insertMany([
+        {
+          description: "Low stock alert: 'Horizon Active Smartwatch' is down to 5 items.",
+          type: "inventory",
+          status: "warning",
+          createdAt: new Date(Date.now() - 10 * 60 * 1000)
+        },
+        {
+          description: "New order #10892 received for 2x 'AeroSound Max Headphones' ($599.98).",
+          type: "order",
+          status: "success",
+          createdAt: new Date(Date.now() - 60 * 60 * 1000)
+        },
+        {
+          description: "Product updated: 'Classic Saddle Leather Wallet' description modified.",
+          type: "product",
+          status: "info",
+          createdAt: new Date(Date.now() - 180 * 60 * 1000)
+        },
+        {
+          description: "AI Vector index rebuilt successfully. 12/12 embeddings synchronized.",
+          type: "search",
+          status: "success",
+          createdAt: new Date(Date.now() - 300 * 60 * 1000)
+        },
+        {
+          description: "Out of stock: 'Apex Velocity Running Shoes' stock count reached 0.",
+          type: "inventory",
+          status: "danger",
+          createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000)
+        }
+      ]);
+      console.log("Seeded default activity stream successfully.");
+    }
+  } catch (error) {
+    console.error("Failed to seed default activities:", error.message);
+  }
+};
+
 const startServer = async () => {
   try {
     await connectDB();
     await ensureDefaultAdmin();
+    await seedDefaultActivities();
 
     const app = express();
 
@@ -50,6 +96,7 @@ const startServer = async () => {
     app.use("/api/products", productRoutes);
     app.use("/api/orders", orderRoutes);
     app.use("/api/cart", cartRoutes);
+    app.use("/api/activities", activityRoutes);
 
     // Health check endpoint
     app.get("/api/health", (req, res) => {

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Menu, Bell, Search, User, ShieldCheck } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 export default function Navbar({ onMenuClick }) {
@@ -84,18 +85,20 @@ export default function Navbar({ onMenuClick }) {
         <div className="h-6 w-px bg-slate-800" />
 
         {/* User Profile Info */}
-        <div className="flex items-center gap-3">
+        <Link to="/admin/profile" className="flex items-center gap-3 hover:opacity-85 transition-opacity cursor-pointer group">
           <div className="text-right hidden sm:block">
-            <p className="text-xs font-semibold text-slate-200">{displayUser.email.split("@")[0]}</p>
+            <p className="text-xs font-semibold text-slate-200 group-hover:text-white transition-colors">
+              {displayUser.email ? displayUser.email.split("@")[0] : "admin"}
+            </p>
             <div className="flex items-center justify-end gap-1 text-[10px] text-slate-500 font-medium">
               <ShieldCheck className="w-3 h-3 text-indigo-400" />
               <span>{displayUser.role}</span>
             </div>
           </div>
-          <div className="w-9 h-9 rounded-full bg-slate-800 border border-slate-700/80 flex items-center justify-center text-slate-300 font-semibold shadow-inner text-sm">
-            <User className="w-4.5 h-4.5 text-slate-400" />
+          <div className="w-9 h-9 rounded-full bg-slate-800 border border-slate-700/80 group-hover:border-slate-600 flex items-center justify-center text-slate-300 font-semibold shadow-inner text-sm transition-colors">
+            <User className="w-4.5 h-4.5 text-slate-400 group-hover:text-slate-200 transition-colors" />
           </div>
-        </div>
+        </Link>
       </div>
     </header>
   );

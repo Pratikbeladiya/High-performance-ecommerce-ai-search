@@ -1,6 +1,7 @@
 import Order from "../models/Order.js";
 import Product from "../models/Product.js";
 import Cart from "../models/Cart.js";
+import { logActivity } from "../utils/activityLogger.js";
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -17,9 +18,18 @@ export const createOrder = async (req, res) => {
     for (const item of items) {
       const product = await Product.findById(item.product.id || item.product._id);
       if (product) {
+        const oldStock = product.stock;
         product.stock = Math.max(0, product.stock - item.quantity);
         product.status = product.stock > 5 ? "In Stock" : product.stock > 0 ? "Low Stock" : "Out of Stock";
         await product.save();
+
+        if (product.stock !== oldStock) {
+          if (product.stock === 0) {
+            await logActivity(null, `Out of stock: "${product.name}" stock count reached 0.`, "inventory", "danger");
+          } else if (product.stock <= 5 && oldStock > 5) {
+            await logActivity(null, `Low stock alert: "${product.name}" is down to ${product.stock} items.`, "inventory", "warning");
+          }
+        }
       }
     }
 
@@ -51,6 +61,15 @@ export const createOrder = async (req, res) => {
     }
 
     const createdOrder = await order.save();
+    
+    // Log new order
+    await logActivity(
+      req.user?._id || null,
+      `New order #${createdOrder.orderId || createdOrder._id} received for ${createdOrder.items.reduce((acc, item) => acc + item.quantity, 0)}x products ($${createdOrder.total.toFixed(2)}).`,
+      "order",
+      "success"
+    );
+
     res.status(201).json(createdOrder);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -97,6 +116,12 @@ export const updateOrderStatus = async (req, res) => {
     if (order) {
       order.status = status;
       const updatedOrder = await order.save();
+      await logActivity(
+        req.user?._id,
+        `Order #${updatedOrder.orderId || updatedOrder._id} status updated to "${status}".`,
+        "order",
+        "info"
+      );
       res.json(updatedOrder);
     } else {
       res.status(404).json({ message: "Order not found" });

@@ -12,9 +12,32 @@ import {
   Activity
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+
+const formatRelativeTime = (dateString) => {
+  if (!dateString) return "recently";
+  const now = new Date();
+  const date = new Date(dateString);
+  const diffMs = now - date;
+  
+  if (isNaN(date.getTime())) return "recently";
+  
+  const diffMins = Math.floor(diffMs / 60000);
+  if (diffMins < 1) return "just now";
+  if (diffMins < 60) return `${diffMins}m ago`;
+  
+  const diffHours = Math.floor(diffMins / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+  
+  const diffDays = Math.floor(diffHours / 24);
+  if (diffDays === 1) return "yesterday";
+  return `${diffDays}d ago`;
+};
 
 export default function Dashboard() {
   const [products, setProducts] = useState([]);
+  const [activities, setActivities] = useState([]);
+  const { token } = useAuth();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -29,8 +52,39 @@ export default function Dashboard() {
       }
     };
 
+    const fetchActivities = async () => {
+      if (!token) return;
+      try {
+        const res = await fetch("/api/activities", {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        if (!res.ok) throw new Error("Failed to load activities");
+        const data = await res.json();
+        setActivities(data);
+      } catch (err) {
+        console.error("Failed to load activities from API, using fallback", err);
+        setActivities([]);
+      }
+    };
+
     fetchProducts();
-  }, []);
+    fetchActivities();
+  }, [token]);
+
+  const displayActivities = useMemo(() => {
+    if (!activities || activities.length === 0) {
+      return recentActivities;
+    }
+    return activities.map((act) => ({
+      id: act._id || act.id,
+      description: act.description,
+      type: act.type,
+      status: act.status,
+      time: formatRelativeTime(act.createdAt)
+    }));
+  }, [activities]);
 
   const stats = useMemo(() => {
     // Compute stats dynamically
@@ -143,7 +197,7 @@ export default function Dashboard() {
         </div>
 
         <div className="space-y-4">
-          {recentActivities.map((act) => (
+          {displayActivities.map((act) => (
             <div
               key={act.id}
               className="flex items-start gap-4 p-3.5 rounded-xl bg-slate-900/30 border border-slate-900/80 hover:border-slate-800/80 hover:bg-slate-900/50 transition-all duration-200"

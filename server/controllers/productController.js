@@ -1,4 +1,5 @@
 import Product from "../models/Product.js";
+import { logActivity } from "../utils/activityLogger.js";
 
 const getStatus = (stock = 0) =>
   stock > 5 ? "In Stock" : stock > 0 ? "Low Stock" : "Out of Stock";
@@ -64,6 +65,14 @@ export const createProduct = async (req, res) => {
     });
 
     const createdProduct = await product.save();
+    
+    await logActivity(req.user?._id, `Product "${createdProduct.name}" added to catalog.`, "product", "success");
+    if (createdProduct.stock === 0) {
+      await logActivity(null, `Out of stock: "${createdProduct.name}" stock count reached 0.`, "inventory", "danger");
+    } else if (createdProduct.stock <= 5) {
+      await logActivity(null, `Low stock alert: "${createdProduct.name}" is down to ${createdProduct.stock} items.`, "inventory", "warning");
+    }
+
     res.status(201).json(createdProduct);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -93,6 +102,8 @@ export const updateProduct = async (req, res) => {
       isVisible,
     } = req.body;
 
+    const oldStock = product.stock;
+
     const fields = {
       name,
       price,
@@ -113,6 +124,16 @@ export const updateProduct = async (req, res) => {
 
     product.status = getStatus(product.stock);
     const updatedProduct = await product.save();
+    
+    await logActivity(req.user?._id, `Product "${updatedProduct.name}" updated.`, "product", "info");
+    if (updatedProduct.stock !== oldStock) {
+      if (updatedProduct.stock === 0) {
+        await logActivity(null, `Out of stock: "${updatedProduct.name}" stock count reached 0.`, "inventory", "danger");
+      } else if (updatedProduct.stock <= 5 && (oldStock > 5 || oldStock === undefined)) {
+        await logActivity(null, `Low stock alert: "${updatedProduct.name}" is down to ${updatedProduct.stock} items.`, "inventory", "warning");
+      }
+    }
+
     res.json(updatedProduct);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -128,7 +149,9 @@ export const deleteProduct = async (req, res) => {
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
+    const productName = product.name;
     await Product.findByIdAndDelete(req.params.id);
+    await logActivity(req.user?._id, `Product "${productName}" deleted from catalog.`, "product", "danger");
     res.json({ message: "Product removed successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });

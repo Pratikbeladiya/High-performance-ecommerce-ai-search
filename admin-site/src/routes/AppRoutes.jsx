@@ -8,6 +8,7 @@ import AddProduct from "../pages/AddProduct";
 import EditProduct from "../pages/EditProduct";
 import Analytics from "../pages/Analytics";
 import SearchTesting from "../pages/SearchTesting";
+import Profile from "../pages/user/Profile";
 
 export default function AppRoutes() {
   return (
@@ -28,6 +29,7 @@ export default function AppRoutes() {
         <Route path="edit-product/:id" element={<EditProduct />} />
         <Route path="analytics" element={<Analytics />} />
         <Route path="search-testing" element={<SearchTesting />} />
+        <Route path="profile" element={<Profile />} />
       </Route>
 
       {/* Fallback */}
