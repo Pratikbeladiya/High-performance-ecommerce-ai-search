@@ -1,5 +1,1 @@
-server creation
-updated backend authentication
-server is created
-Add authentication
-Add Product Search API + Pagination  
+Server creation updated,  environment configuration using dotenv added, backend authentication implemented, JWT authentication middleware added, Product Search API with Pagination implemented.
