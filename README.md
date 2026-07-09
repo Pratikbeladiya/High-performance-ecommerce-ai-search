@@ -33,15 +33,17 @@ Administrators can manage products, categories, users, orders, sales analytics, 
 # ✨ Features
 
 ## 🛍️ Customer Store
-
+---
 - User Authentication
 - Secure Login & Registration
 - JWT Authentication
+---
 - Product Search
 - Product Categories
 - Product Details
 
 ![Products](./screenshots/user-products.png)
+![Products](./screenshots/productDetail.png)
 
 
 
