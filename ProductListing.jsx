@@ -1,33 +1,68 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { DUMMY_PRODUCTS } from './productsData';
 
 export default function ProductListing({ setView, setSelectedProduct, addToCart }) {
   const [searchTerm, setSearchTerm] = useState('');
+  // Added debounced state for performance
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [priceRange, setPriceRange] = useState('All');
   const [sortBy, setSortBy] = useState('Most Popular');
 
+  // Debounce effect: waits 300ms after the user stops typing
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+    }, 300);
+
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
+
+  // Dynamically extract categories from product data
+  const categories = useMemo(() => {
+    const extracted = new Set(DUMMY_PRODUCTS.map(p => p.category));
+    return ['All', ...Array.from(extracted)];
+  }, []);
+
   // Filter & Sort Processing Logic
   const filteredProducts = useMemo(() => {
-    let result = [...DUMMY_PRODUCTS];
+    let result = DUMMY_PRODUCTS;
 
-    if (searchTerm) {
-      result = result.filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase()));
+    // 1. Filter by Search Term
+    if (debouncedSearch.trim()) {
+      const lowerSearch = debouncedSearch.toLowerCase();
+      result = result.filter(p => p.name.toLowerCase().includes(lowerSearch));
     }
+
+    // 2. Filter by Category
     if (selectedCategory !== 'All') {
       result = result.filter(p => p.category === selectedCategory);
     }
+
+    // 3. Filter by Price Range
     if (priceRange !== 'All') {
-      if (priceRange === 'under-50') result = result.filter(p => p.price < 50);
-      if (priceRange === '50-150') result = result.filter(p => p.price >= 50 && p.price <= 150);
-      if (priceRange === 'over-150') result = result.filter(p => p.price > 150);
+      switch (priceRange) {
+        case 'under-50':
+          result = result.filter(p => p.price < 50);
+          break;
+        case '50-150':
+          result = result.filter(p => p.price >= 50 && p.price <= 150);
+          break;
+        case 'over-150':
+          result = result.filter(p => p.price > 150);
+          break;
+        default:
+          break;
+      }
     }
 
-    if (sortBy === 'Price: Low to High') result.sort((a, b) => a.price - b.price);
-    if (sortBy === 'Price: High to Low') result.sort((a, b) => b.price - a.price);
+    // 4. Sort results (Creating a shallow copy before sorting to avoid side effects)
+    const sortedResult = [...result];
+    if (sortBy === 'Price: Low to High') sortedResult.sort((a, b) => a.price - b.price);
+    if (sortBy === 'Price: High to Low') sortedResult.sort((a, b) => b.price - a.price);
 
-    return result;
-  }, [searchTerm, selectedCategory, priceRange, sortBy]);
+    return sortedResult;
+  }, [debouncedSearch, selectedCategory, priceRange, sortBy]);
 
   const clearAllFilters = () => {
     setSearchTerm('');
@@ -44,7 +79,7 @@ export default function ProductListing({ setView, setSelectedProduct, addToCart 
           <i className="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-sm"></i>
           <input 
             type="text" 
-            placeholder="Filter current results..." 
+            placeholder="Search products..." 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:border-indigo-500"
@@ -80,7 +115,7 @@ export default function ProductListing({ setView, setSelectedProduct, addToCart 
           <div className="mb-6">
             <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Categories</h4>
             <div className="space-y-2.5">
-              {['All', 'Electronics', 'Apparel', 'Accessories'].map((cat) => (
+              {categories.map((cat) => (
                 <label key={cat} className="flex items-center text-sm font-medium text-slate-600 cursor-pointer">
                   <input 
                     type="radio" 
@@ -132,7 +167,7 @@ export default function ProductListing({ setView, setSelectedProduct, addToCart 
                 <div key={product.id} className="bg-white border border-slate-200 rounded-xl overflow-hidden group hover:shadow-lg transition">
                   <div 
                     onClick={() => { setSelectedProduct(product); setView('details'); }}
-                    className="block aspect-square w-full bg-slate-100 cursor-pointer"
+                    className="block aspect-square w-full bg-slate-100 cursor-pointer overflow-hidden"
                   >
                     <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
                   </div>
@@ -145,10 +180,12 @@ export default function ProductListing({ setView, setSelectedProduct, addToCart 
                       {product.name}
                     </h3>
                     <div className="flex items-center justify-between mt-4">
-                      <span class="text-xl font-extrabold text-slate-900">${product.price.toFixed(2)}</span>
+                      {/* Fixed typo: changed class to className */}
+                      <span className="text-xl font-extrabold text-slate-900">${product.price.toFixed(2)}</span>
                       <button 
                         onClick={() => addToCart(product)}
                         className="p-2.5 bg-indigo-50 group-hover:bg-indigo-600 text-indigo-600 group-hover:text-white rounded-lg transition cursor-pointer"
+                        aria-label={`Add ${product.name} to cart`}
                       >
                         <i className="fa-solid fa-cart-plus"></i>
                       </button>
