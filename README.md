@@ -40,11 +40,20 @@ Administrators can manage products, categories, users, orders, sales analytics, 
 - Product Search
 - Product Categories
 - Product Details
+
+![Products](./screenshots/user-products.png)
+
+
+
+
 - Shopping Cart
 - Wishlist
 - Checkout
 - Order Placement
 - Order History
+
+![Order](./screenshots/orders.png)
+
 - User Profile
 - Address Management
 - Responsive Design
