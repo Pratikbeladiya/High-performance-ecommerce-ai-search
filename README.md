@@ -33,24 +33,24 @@ Administrators can manage products, categories, users, orders, sales analytics, 
 # ✨ Features
 
 ## 🛍️ Customer Store
----
+
 - User Authentication
 - Secure Login & Registration
 - JWT Authentication
----
+
 - Product Search
 - Product Categories
-- Product Details
 
 ![Products](./screenshots/user-products.png)
+
+- Product Details
 ![Products](./screenshots/productDetail.png)
-
-
-
 
 - Shopping Cart
 - Wishlist
 - Checkout
+![Order](./screenshots/cart.png)
+- 
 - Order Placement
 - Order History
 
