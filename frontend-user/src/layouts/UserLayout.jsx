@@ -15,12 +15,14 @@ function UserNavbar() {
   const { user, logout, isAuthenticated } = useAuth();
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
   const searchRef = useRef(null);
+  const profileMenuRef = useRef(null);
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 20);
@@ -35,6 +37,17 @@ function UserNavbar() {
   useEffect(() => {
     if (searchOpen) searchRef.current?.focus();
   }, [searchOpen]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
+        setProfileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -102,29 +115,34 @@ function UserNavbar() {
 
               {/* Profile */}
               {isAuthenticated ? (
-                <div className='relative group hidden sm:block'>
-                  <button className='flex items-center gap-1.5 p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800/60 transition-all'>
+                <div ref={profileMenuRef} className='relative hidden sm:block'>
+                  <button
+                    onClick={() => setProfileMenuOpen(prev => !prev)}
+                    className='flex items-center gap-1.5 p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800/60 transition-all'
+                  >
                     <User className='w-5 h-5' />
                     <span className='text-xs font-semibold max-w-[80px] truncate hidden md:inline'>{user.name}</span>
-                    <ChevronDown className='w-3.5 h-3.5 opacity-60 group-hover:opacity-100 transition-opacity' />
+                    <ChevronDown className={`w-3.5 h-3.5 transition-transform ${profileMenuOpen ? 'rotate-180' : ''}`} />
                   </button>
-                  <div className='absolute right-0 mt-2 w-48 bg-slate-900 border border-slate-800 rounded-2xl p-2 shadow-2xl opacity-0 scale-95 pointer-events-none group-hover:opacity-100 group-hover:scale-100 group-hover:pointer-events-auto transition-all duration-200 z-50'>
-                    <Link to='/profile' className='flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors'>
-                      <User className='w-4 h-4' /> My Profile
-                    </Link>
-                    <Link to='/orders' className='flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors'>
-                      <Package className='w-4 h-4' /> My Orders
-                    </Link>
-                    {user.role === 'admin' && (
-                      <Link to='/admin/dashboard' className='flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors'>
-                        <Shield className='w-4 h-4' /> Admin Console
+                  {profileMenuOpen && (
+                    <div className='absolute right-0 mt-2 w-48 bg-slate-900 border border-slate-800 rounded-2xl p-2 shadow-2xl z-50'>
+                      <Link to='/profile' onClick={() => setProfileMenuOpen(false)} className='flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors'>
+                        <User className='w-4 h-4' /> My Profile
                       </Link>
-                    )}
-                    <div className='h-px bg-slate-800 my-1' />
-                    <button onClick={logout} className='w-full flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 transition-colors text-left bg-transparent border-none cursor-pointer'>
-                      Logout
-                    </button>
-                  </div>
+                      <Link to='/orders' onClick={() => setProfileMenuOpen(false)} className='flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors'>
+                        <Package className='w-4 h-4' /> My Orders
+                      </Link>
+                      {user.role === 'admin' && (
+                        <Link to='/admin/dashboard' onClick={() => setProfileMenuOpen(false)} className='flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors'>
+                          <Shield className='w-4 h-4' /> Admin Console
+                        </Link>
+                      )}
+                      <div className='h-px bg-slate-800 my-1' />
+                      <button onClick={() => { logout(); setProfileMenuOpen(false); }} className='w-full flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 transition-colors text-left bg-transparent border-none cursor-pointer'>
+                        Logout
+                      </button>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <button onClick={() => setAuthModalOpen(true)} className='hidden sm:flex items-center gap-1 px-4.5 py-2 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-bold rounded-xl text-xs transition-all shadow-md shadow-indigo-600/15 cursor-pointer'>

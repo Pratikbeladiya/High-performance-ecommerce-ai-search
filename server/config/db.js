@@ -1,9 +1,15 @@
 import mongoose from "mongoose";
+import dns from "dns";
+
+// Configure public DNS to resolve MongoDB Atlas hostnames reliably
+try {
+  dns.setServers(["8.8.8.8", "1.1.1.1"]);
+} catch (err) {}
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGO_URI);
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log("Database Connected successfully");
   } catch (error) {
     console.error(`Database connection error: ${error.message}`);
     process.exit(1);
@@ -11,3 +17,6 @@ const connectDB = async () => {
 };
 
 export default connectDB;
+
+
+

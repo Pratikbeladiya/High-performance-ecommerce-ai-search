@@ -12,7 +12,7 @@ import {
   Plus,
 } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
-import { getPublicProducts, getProductById } from '../../utils/userHelpers';
+import { getPublicProducts, getProductById, formatPrice } from '../../utils/userHelpers';
 
 function RelatedCard({ product }) {
   return (
@@ -37,7 +37,7 @@ function RelatedCard({ product }) {
         <p className="text-slate-200 text-sm font-medium truncate group-hover:text-indigo-400 transition-colors">
           {product.name}
         </p>
-        <p className="text-indigo-400 font-bold mt-1">${parseFloat(product.price).toFixed(2)}</p>
+        <p className="text-indigo-400 font-bold mt-1">₹{parseFloat(product.price).toFixed(2)}</p>
       </div>
     </Link>
   );
@@ -126,28 +126,33 @@ export default function ProductDetail() {
   }
 
   const inStock = product.stock > 0 && product.status !== 'Out of Stock';
-  const images = product.images?.length ? product.images : product.image ? [product.image] : [];
-  const rating = product.rating || (4 + Math.random()).toFixed(1);
+  const images = product.images?.length ? product.images : product.imageUrl ? [product.imageUrl] : product.image ? [product.image] : [];
+  const rating = product.rating || (4.5).toFixed(1);
   const reviewCount = product.reviewCount || Math.floor(Math.random() * 200 + 20);
   const tags = Array.isArray(product.tags) ? product.tags : product.tags ? product.tags.split(',').map(t => t.trim()) : [];
+  
+  // Calculate discount percentage
+  const price = parseFloat(product.price || 0);
+  const originalPrice = parseFloat(product.originalPrice || price * 1.15); // default 15% discount if not present in DB
+  const discountPercent = Math.round(((originalPrice - price) / originalPrice) * 100);
 
   return (
     <div className="py-6 px-4 max-w-7xl mx-auto">
       {/* Breadcrumb */}
       <Link
         to="/catalog"
-        className="inline-flex items-center gap-2 text-slate-400 hover:text-indigo-400 transition-colors text-sm mb-8 group"
+        className="inline-flex items-center gap-2 text-slate-400 hover:text-indigo-400 transition-colors text-xs mb-5 group"
       >
-        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+        <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
         Back to Catalog
       </Link>
 
       {/* Main Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-16">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-10">
         {/* Left: Images */}
-        <div className="space-y-4">
+        <div className="lg:col-span-5 space-y-4">
           {/* Main Image */}
-          <div className="aspect-square bg-slate-800/50 border border-slate-700/50 rounded-2xl overflow-hidden">
+          <div className="aspect-square bg-slate-800/50 border border-slate-700/50 rounded-2xl overflow-hidden max-w-sm mx-auto lg:mx-0 w-full">
             {images[activeImage] ? (
               <img
                 src={images[activeImage]}
@@ -164,7 +169,7 @@ export default function ProductDetail() {
 
           {/* Thumbnail Strip */}
           {images.length > 1 && (
-            <div className="flex gap-3">
+            <div className="flex gap-3 max-w-sm mx-auto lg:mx-0">
               {images.map((img, i) => (
                 <button
                   key={i}
@@ -182,7 +187,7 @@ export default function ProductDetail() {
         </div>
 
         {/* Right: Product Info */}
-        <div className="flex flex-col gap-5">
+        <div className="lg:col-span-7 flex flex-col gap-4">
           {/* Category Badge */}
           {product.category && (
             <span className="inline-flex items-center gap-1.5 w-fit px-3 py-1 bg-indigo-500/10 border border-indigo-500/30 rounded-full text-indigo-400 text-xs font-semibold uppercase tracking-wider">
@@ -192,7 +197,7 @@ export default function ProductDetail() {
           )}
 
           {/* Product Name */}
-          <h1 className="text-3xl md:text-4xl font-bold text-slate-100 leading-tight">
+          <h1 className="text-2xl font-bold text-slate-100 leading-tight">
             {product.name}
           </h1>
 
@@ -214,14 +219,19 @@ export default function ProductDetail() {
           </div>
 
           {/* Price */}
-          <div className="flex items-end gap-3">
-            <span className="text-4xl font-black text-white">
-              ${parseFloat(product.price || 0).toFixed(2)}
+          <div className="flex items-center gap-3 flex-wrap">
+            <span className="text-2xl font-bold text-white">
+              {formatPrice(price)}
             </span>
-            {product.originalPrice && parseFloat(product.originalPrice) > parseFloat(product.price) && (
-              <span className="text-slate-500 line-through text-xl mb-1">
-                ${parseFloat(product.originalPrice).toFixed(2)}
-              </span>
+            {originalPrice > price && (
+              <>
+                <span className="text-slate-500 line-through text-sm">
+                  {formatPrice(originalPrice)}
+                </span>
+                <span className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs px-2 py-0.5 rounded-md font-bold">
+                  {discountPercent}% OFF
+                </span>
+              </>
             )}
           </div>
 
@@ -264,6 +274,24 @@ export default function ProductDetail() {
             </div>
           )}
 
+          {/* Delivery & Returns Info */}
+          <div className="grid grid-cols-2 gap-3.5 border-t border-b border-slate-800/80 py-4 my-2">
+            <div className="flex items-center gap-2.5 bg-slate-900/30 p-3 rounded-xl border border-slate-900/60">
+              <span className="flex w-7 h-7 rounded-lg bg-indigo-500/10 text-indigo-400 items-center justify-center font-bold text-sm">↺</span>
+              <div>
+                <p className="font-semibold text-xs text-slate-200">7 Days Return</p>
+                <p className="text-[10px] text-slate-500">Hassle-free replacement</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2.5 bg-slate-900/30 p-3 rounded-xl border border-slate-900/60">
+              <span className="flex w-7 h-7 rounded-lg bg-indigo-500/10 text-indigo-400 items-center justify-center font-bold text-sm">🚚</span>
+              <div>
+                <p className="font-semibold text-xs text-slate-200">Delivery in 3 Days</p>
+                <p className="text-[10px] text-slate-500">Fast & trackable shipping</p>
+              </div>
+            </div>
+          </div>
+
           {/* Size Selection */}
 
           <div className="space-y-3">
@@ -277,15 +305,15 @@ export default function ProductDetail() {
               </span>
             </div>
 
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-2">
               {sizes.map((size) => (
                 <button
                   key={size}
                   onClick={() => setSelectedSize(size)}
-                  className={`w-12 h-12 rounded-xl border font-semibold transition-all duration-300
+                  className={`w-9 h-9 rounded-lg border text-xs font-semibold transition-all duration-200
         ${selectedSize === size
-                      ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-500/30 scale-105'
-                      : 'bg-slate-800 border-slate-700 text-slate-300 hover:border-indigo-500 hover:text-white'
+                      ? 'bg-indigo-600 border-indigo-600 text-white shadow-md shadow-indigo-500/20'
+                      : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-indigo-500 hover:text-white'
                     }`}
                 >
                   {size}
@@ -299,34 +327,34 @@ export default function ProductDetail() {
 
           {/* Quantity Selector + Add to Cart */}
           {inStock && (
-            <div className="flex flex-col sm:flex-row gap-4 pt-2">
+            <div className="flex flex-col sm:flex-row gap-3.5 pt-1">
               {/* Quantity */}
-              <div className="flex items-center gap-0 bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+              <div className="flex items-center gap-0 bg-slate-800 border border-slate-700 rounded-lg overflow-hidden h-10">
                 <button
                   onClick={decrementQty}
                   disabled={quantity <= 1}
-                  className="px-4 py-3 text-slate-300 hover:text-white hover:bg-slate-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="px-3.5 py-2 text-slate-300 hover:text-white hover:bg-slate-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  <Minus className="w-4 h-4" />
+                  <Minus className="w-3.5 h-3.5" />
                 </button>
-                <span className="px-5 py-3 text-white font-semibold min-w-[48px] text-center select-none">
+                <span className="px-3.5 text-white text-sm font-semibold min-w-[36px] text-center select-none">
                   {quantity}
                 </span>
                 <button
                   onClick={incrementQty}
                   disabled={quantity >= (product.stock ?? 99)}
-                  className="px-4 py-3 text-slate-300 hover:text-white hover:bg-slate-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="px-3.5 py-2 text-slate-300 hover:text-white hover:bg-slate-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  <Plus className="w-4 h-4" />
+                  <Plus className="w-3.5 h-3.5" />
                 </button>
               </div>
 
               {/* Add to Cart */}
               <button
                 onClick={handleAddToCart}
-                className={`flex-1 flex items-center justify-center gap-2.5 px-6 py-3 rounded-xl font-semibold text-base transition-all duration-300 ${added
+                className={`h-10 flex-1 flex items-center justify-center gap-2 px-5 rounded-lg font-semibold text-sm transition-all duration-200 ${added
                   ? 'bg-emerald-600 text-white scale-95'
-                  : 'bg-indigo-600 hover:bg-indigo-500 text-white hover:shadow-lg hover:shadow-indigo-500/25 hover:-translate-y-0.5'
+                  : 'bg-indigo-600 hover:bg-indigo-500 text-white hover:shadow-md hover:shadow-indigo-500/20 hover:-translate-y-0.5'
                   }`}
               >
                 {added ? (

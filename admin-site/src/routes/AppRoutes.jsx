@@ -1,12 +1,14 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import AdminLayout from "../layouts/AdminLayout";
 import Login from "../pages/Login";
+import Signup from "../pages/Signup";
 import Dashboard from "../pages/Dashboard";
 import Products from "../pages/Products";
 import AddProduct from "../pages/AddProduct";
 import EditProduct from "../pages/EditProduct";
 import Analytics from "../pages/Analytics";
 import SearchTesting from "../pages/SearchTesting";
+import Profile from "../pages/user/Profile";
 
 export default function AppRoutes() {
   return (
@@ -16,6 +18,7 @@ export default function AppRoutes() {
 
       {/* Admin Login */}
       <Route path="/admin/login" element={<Login />} />
+      <Route path="/admin/signup" element={<Signup />} />
 
       {/* Protected Admin Routes */}
       <Route path="/admin" element={<AdminLayout />}>
@@ -26,6 +29,7 @@ export default function AppRoutes() {
         <Route path="edit-product/:id" element={<EditProduct />} />
         <Route path="analytics" element={<Analytics />} />
         <Route path="search-testing" element={<SearchTesting />} />
+        <Route path="profile" element={<Profile />} />
       </Route>
 
       {/* Fallback */}

@@ -1,9 +1,8 @@
-import { useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import PageHeader from "../components/common/PageHeader";
 import StatsCard from "../components/dashboard/StatsCard";
 import InventoryCard from "../components/dashboard/InventoryCard";
 import AnalyticsCard from "../components/dashboard/AnalyticsCard";
-import { initialProducts } from "../data/products";
 import { salesTrends, recentActivities } from "../data/analytics";
 import {
   Package,
@@ -13,21 +12,79 @@ import {
   Activity
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+
+const formatRelativeTime = (dateString) => {
+  if (!dateString) return "recently";
+  const now = new Date();
+  const date = new Date(dateString);
+  const diffMs = now - date;
+  
+  if (isNaN(date.getTime())) return "recently";
+  
+  const diffMins = Math.floor(diffMs / 60000);
+  if (diffMins < 1) return "just now";
+  if (diffMins < 60) return `${diffMins}m ago`;
+  
+  const diffHours = Math.floor(diffMins / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+  
+  const diffDays = Math.floor(diffHours / 24);
+  if (diffDays === 1) return "yesterday";
+  return `${diffDays}d ago`;
+};
 
 export default function Dashboard() {
-  const [products] = useState(() => {
-    // Read products from localStorage first to capture any additions/edits
-    const stored = localStorage.getItem("admin_products");
-    if (stored) {
+  const [products, setProducts] = useState([]);
+  const [activities, setActivities] = useState([]);
+  const { token } = useAuth();
+
+  useEffect(() => {
+    const fetchProducts = async () => {
       try {
-        return JSON.parse(stored);
-      } catch {
-        // use default
+        const res = await fetch("/api/products?isAdmin=true");
+        if (!res.ok) throw new Error("Failed to load products");
+        const data = await res.json();
+        setProducts(data.map((p) => ({ ...p, id: p._id })));
+      } catch (err) {
+        console.error(err);
+        setProducts([]);
       }
+    };
+
+    const fetchActivities = async () => {
+      if (!token) return;
+      try {
+        const res = await fetch("/api/activities", {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        if (!res.ok) throw new Error("Failed to load activities");
+        const data = await res.json();
+        setActivities(data);
+      } catch (err) {
+        console.error("Failed to load activities from API, using fallback", err);
+        setActivities([]);
+      }
+    };
+
+    fetchProducts();
+    fetchActivities();
+  }, [token]);
+
+  const displayActivities = useMemo(() => {
+    if (!activities || activities.length === 0) {
+      return recentActivities;
     }
-    localStorage.setItem("admin_products", JSON.stringify(initialProducts));
-    return initialProducts;
-  });
+    return activities.map((act) => ({
+      id: act._id || act.id,
+      description: act.description,
+      type: act.type,
+      status: act.status,
+      time: formatRelativeTime(act.createdAt)
+    }));
+  }, [activities]);
 
   const stats = useMemo(() => {
     // Compute stats dynamically
@@ -140,7 +197,7 @@ export default function Dashboard() {
         </div>
 
         <div className="space-y-4">
-          {recentActivities.map((act) => (
+          {displayActivities.map((act) => (
             <div
               key={act.id}
               className="flex items-start gap-4 p-3.5 rounded-xl bg-slate-900/30 border border-slate-900/80 hover:border-slate-800/80 hover:bg-slate-900/50 transition-all duration-200"

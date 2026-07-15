@@ -19,7 +19,16 @@ export default function ProductForm({
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const categories = ["Electronics", "Home & Living", "Apparel"];
+  const categories = [
+    "Electronics",
+    "Home & Living",
+    "Apparel",
+    "Beauty & Personal Care",
+    "Sports & Outdoors",
+    "Books & Stationery",
+    "Automotive",
+    "Groceries"
+  ];
 
   const validate = () => {
     const tempErrors = {};
@@ -77,9 +86,9 @@ export default function ProductForm({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Form Fields Section */}
         <div className="lg:col-span-2 space-y-5">
-          <div className="glass-panel p-6 rounded-2xl space-y-4.5">
+          <div className="glass-panel p-6 rounded-2xl space-y-6">
             {/* Product Name */}
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               <label className="text-xs font-semibold text-slate-300 block">
                 PRODUCT NAME
               </label>
@@ -91,13 +100,13 @@ export default function ProductForm({
                 placeholder="e.g. AeroSound Headphones"
                 className={`w-full bg-slate-900 border ${
                   errors.name ? "border-rose-500/70 focus:ring-rose-500/20" : "border-slate-800 focus:border-indigo-500"
-                } rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all`}
+                } rounded-xl px-4.5 py-3 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all`}
               />
               {errors.name && <p className="text-[10px] text-rose-400 font-semibold">{errors.name}</p>}
             </div>
 
             {/* Description */}
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               <label className="text-xs font-semibold text-slate-300 block">
                 DESCRIPTION
               </label>
@@ -109,15 +118,15 @@ export default function ProductForm({
                 placeholder="Describe product highlights, dimensions, and specifications..."
                 className={`w-full bg-slate-900 border ${
                   errors.description ? "border-rose-500/70 focus:ring-rose-500/20" : "border-slate-800 focus:border-indigo-500"
-                } rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all resize-none`}
+                } rounded-xl px-4.5 py-3.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all resize-none`}
               />
               {errors.description && <p className="text-[10px] text-rose-400 font-semibold">{errors.description}</p>}
             </div>
 
             {/* Price, Stock, Category Row */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               {/* Category select */}
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 <label className="text-xs font-semibold text-slate-300 block">
                   CATEGORY
                 </label>
@@ -125,7 +134,7 @@ export default function ProductForm({
                   name="category"
                   value={formData.category}
                   onChange={handleChange}
-                  className="w-full bg-slate-900 border border-slate-800 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-sm text-slate-300 focus:outline-none cursor-pointer"
+                  className="w-full bg-slate-900 border border-slate-800 focus:border-indigo-500 rounded-xl px-4 py-3 text-sm text-slate-300 focus:outline-none cursor-pointer"
                 >
                   {categories.map((cat) => (
                     <option key={cat} value={cat}>
@@ -136,9 +145,9 @@ export default function ProductForm({
               </div>
 
               {/* Price */}
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 <label className="text-xs font-semibold text-slate-300 block">
-                  PRICE (USD)
+                  PRICE (INR)
                 </label>
                 <input
                   type="number"
@@ -149,13 +158,13 @@ export default function ProductForm({
                   placeholder="299.99"
                   className={`w-full bg-slate-900 border ${
                     errors.price ? "border-rose-500/70 focus:ring-rose-500/20" : "border-slate-800 focus:border-indigo-500"
-                  } rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all`}
+                  } rounded-xl px-4.5 py-3 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all`}
                 />
                 {errors.price && <p className="text-[10px] text-rose-400 font-semibold">{errors.price}</p>}
               </div>
 
               {/* Stock */}
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 <label className="text-xs font-semibold text-slate-300 block">
                   STOCK QUANTITY
                 </label>
@@ -167,7 +176,7 @@ export default function ProductForm({
                   placeholder="50"
                   className={`w-full bg-slate-900 border ${
                     errors.stock ? "border-rose-500/70 focus:ring-rose-500/20" : "border-slate-800 focus:border-indigo-500"
-                  } rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all`}
+                  } rounded-xl px-4.5 py-3 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all`}
                 />
                 {errors.stock && <p className="text-[10px] text-rose-400 font-semibold">{errors.stock}</p>}
               </div>
@@ -183,7 +192,7 @@ export default function ProductForm({
             </h3>
 
             {/* Image URL Input */}
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               <label className="text-xs font-semibold text-slate-400 block">
                 IMAGE URL
               </label>
@@ -195,7 +204,7 @@ export default function ProductForm({
                 placeholder="https://images.unsplash.com/..."
                 className={`w-full bg-slate-900 border ${
                   errors.imageUrl ? "border-rose-500/70" : "border-slate-800 focus:border-indigo-500"
-                } rounded-xl px-4 py-2.5 text-xs text-slate-200 focus:outline-none transition-all`}
+                } rounded-xl px-4 py-3 text-xs text-slate-200 focus:outline-none transition-all`}
               />
               {errors.imageUrl && <p className="text-[10px] text-rose-400 font-semibold">{errors.imageUrl}</p>}
             </div>

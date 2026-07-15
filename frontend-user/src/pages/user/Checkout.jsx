@@ -94,7 +94,11 @@ export default function Checkout() {
     zip: '',
     country: 'United States',
   });
-  const [paymentMethod, setPaymentMethod] = useState('visa');
+  const [paymentMethod, setPaymentMethod] = useState('upi');
+  const [paymentTab, setPaymentTab] = useState('upi'); // 'upi' | 'card' | 'netbanking' | 'paypal'
+  const [selectedUpiApp, setSelectedUpiApp] = useState('gpay'); // 'gpay' | 'phonepe' | 'paytm' | 'other'
+  const [upiId, setUpiId] = useState('');
+  const [selectedBank, setSelectedBank] = useState('hdfc'); // 'hdfc' | 'sbi' | 'icici' | 'axis'
   const [showModal, setShowModal] = useState(false);
   const [errors, setErrors] = useState({});
 
@@ -158,6 +162,17 @@ export default function Checkout() {
       'ORD-' +
       Math.random().toString(36).substring(2, 8).toUpperCase();
     
+    let friendlyPaymentMethod = paymentMethod;
+    if (paymentTab === 'upi') {
+      friendlyPaymentMethod = `UPI - ${selectedUpiApp === 'other' ? (upiId || 'Other UPI ID') : (selectedUpiApp === 'gpay' ? 'GPay' : selectedUpiApp === 'phonepe' ? 'PhonePe' : 'Paytm')}`;
+    } else if (paymentTab === 'card') {
+      friendlyPaymentMethod = 'Credit/Debit Card';
+    } else if (paymentTab === 'netbanking') {
+      friendlyPaymentMethod = `Net Banking (${selectedBank.toUpperCase()})`;
+    } else if (paymentTab === 'paypal') {
+      friendlyPaymentMethod = 'PayPal';
+    }
+
     const order = {
       orderId, // Unique schema key
       id: orderId, // Legacy mapping compatibility
@@ -179,7 +194,7 @@ export default function Checkout() {
       total: TOTAL,
       deliveryAddress: { ...form },
       address: `${form.address}, ${form.city}, ${form.zip}, ${form.country}`,
-      paymentMethod,
+      paymentMethod: friendlyPaymentMethod,
     };
     
     await addOrder(order, token);
@@ -333,76 +348,192 @@ export default function Checkout() {
             </div>
 
             {/* Payment Section */}
-            <div className="bg-slate-900/60 border border-slate-700/50 rounded-2xl p-6 space-y-5">
+            <div className="bg-slate-900/60 border border-slate-700/50 rounded-2xl p-6 space-y-6">
               <h2 className="text-lg font-semibold text-slate-200 flex items-center gap-2">
                 <CreditCard className="w-5 h-5 text-indigo-400" />
                 Payment Method
               </h2>
 
-              <div className="grid grid-cols-3 gap-3">
+              {/* Professional Tab Selector */}
+              <div className="flex border border-slate-700/50 rounded-xl overflow-hidden text-xs">
                 {[
-                  { id: 'visa', label: 'VISA', sub: 'Credit / Debit' },
-                  { id: 'mastercard', label: 'MC', sub: 'Mastercard' },
-                  { id: 'paypal', label: 'PayPal', sub: 'Express Pay' },
-                ].map((pm) => (
+                  { id: 'upi', label: 'UPI / Pay' },
+                  { id: 'card', label: 'Credit/Debit Card' },
+                  { id: 'netbanking', label: 'Net Banking' },
+                  { id: 'paypal', label: 'PayPal' },
+                ].map((tab) => (
                   <button
-                    key={pm.id}
+                    key={tab.id}
                     type="button"
-                    onClick={() => setPaymentMethod(pm.id)}
-                    className={`flex flex-col items-center gap-1.5 p-4 rounded-xl border-2 transition-all cursor-pointer ${
-                      paymentMethod === pm.id
-                        ? 'border-indigo-500 bg-indigo-500/10'
-                        : 'border-slate-700 bg-slate-800/40 hover:border-slate-500'
+                    onClick={() => {
+                      setPaymentTab(tab.id);
+                      setPaymentMethod(tab.id);
+                    }}
+                    className={`flex-1 py-3 text-center font-bold transition-all cursor-pointer ${
+                      paymentTab === tab.id
+                        ? 'bg-indigo-600 text-white shadow-inner'
+                        : 'bg-slate-800/40 text-slate-400 hover:text-slate-200 hover:bg-slate-800/80 border-r border-slate-700 last:border-r-0'
                     }`}
                   >
-                    <span
-                      className={`text-lg font-black tracking-tight ${
-                        pm.id === 'visa'
-                          ? 'text-blue-400'
-                          : pm.id === 'mastercard'
-                          ? 'text-orange-400'
-                          : 'text-sky-400'
-                      }`}
-                    >
-                      {pm.label}
-                    </span>
-                    <span className="text-slate-500 text-xs">{pm.sub}</span>
+                    {tab.label}
                   </button>
                 ))}
               </div>
 
-              {/* Card Number Mock */}
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-slate-400 text-sm mb-1.5">Card Number</label>
-                  <input
-                    type="text"
-                    placeholder="•••• •••• •••• ••••"
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono tracking-widest"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-slate-400 text-sm mb-1.5">Expiry</label>
-                    <input
-                      type="text"
-                      placeholder="MM / YY"
-                      className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono"
-                    />
+              {/* UPI Tab View */}
+              {paymentTab === 'upi' && (
+                <div className="space-y-4 animate-[fade-in_0.2s_ease-out]">
+                  <div className="grid grid-cols-4 gap-2">
+                    {[
+                      { id: 'gpay', label: 'GPay', icon: '⚡ GPay' },
+                      { id: 'phonepe', label: 'PhonePe', icon: '📱 PhonePe' },
+                      { id: 'paytm', label: 'Paytm', icon: '🪙 Paytm' },
+                      { id: 'other', label: 'Other UPI', icon: '✏️ Other UPI' },
+                    ].map((app) => (
+                      <button
+                        key={app.id}
+                        type="button"
+                        onClick={() => setSelectedUpiApp(app.id)}
+                        className={`flex flex-col items-center justify-center py-2.5 px-1.5 rounded-xl border transition-all cursor-pointer ${
+                          selectedUpiApp === app.id
+                            ? 'border-indigo-500 bg-indigo-500/10 text-white font-bold'
+                            : 'border-slate-800 bg-slate-900/30 text-slate-400 hover:border-slate-700'
+                        }`}
+                      >
+                        <span className="text-[10px] font-semibold text-center leading-snug whitespace-nowrap">{app.icon}</span>
+                      </button>
+                    ))}
                   </div>
-                  <div>
-                    <label className="block text-slate-400 text-sm mb-1.5">CVV</label>
-                    <input
-                      type="text"
-                      placeholder="•••"
-                      className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono"
-                    />
+
+                  {selectedUpiApp === 'other' ? (
+                    <div className="space-y-2">
+                      <label className="block text-slate-400 text-xs font-medium">Enter UPI ID</label>
+                      <input
+                        type="text"
+                        value={upiId}
+                        onChange={(e) => setUpiId(e.target.value)}
+                        placeholder="e.g. mobileNumber@ybl or user@okaxis"
+                        className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm font-mono"
+                      />
+                    </div>
+                  ) : (
+                    <div className="bg-slate-800/20 p-4 rounded-xl border border-slate-800 text-[11px] text-slate-400 flex items-start gap-2.5">
+                      <span className="text-indigo-400 font-bold text-sm">💡</span>
+                      <p className="leading-normal">
+                        Upon placing order, you will receive a notification to complete the payment on your registered <strong>{selectedUpiApp === 'gpay' ? 'Google Pay' : selectedUpiApp === 'phonepe' ? 'PhonePe' : 'Paytm'}</strong> app.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Card Tab View */}
+              {paymentTab === 'card' && (
+                <div className="space-y-4 animate-[fade-in_0.2s_ease-out]">
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-slate-400 text-xs mb-1.5 font-medium">Cardholder Name</label>
+                      <input
+                        type="text"
+                        placeholder="John Doe"
+                        className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-slate-400 text-xs mb-1.5 font-medium">Card Number</label>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          placeholder="4111 2222 3333 4444"
+                          className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono tracking-wider text-sm pr-12"
+                        />
+                        <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-extrabold tracking-tight text-slate-500">
+                          VISA/MC
+                        </span>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-slate-400 text-xs mb-1.5 font-medium">Expiry</label>
+                        <input
+                          type="text"
+                          placeholder="MM / YY"
+                          className="w-full bg-slate-850 border border-slate-700 rounded-xl px-4 py-2.5 text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-slate-400 text-xs mb-1.5 font-medium">CVV</label>
+                        <input
+                          type="text"
+                          placeholder="•••"
+                          className="w-full bg-slate-855 border border-slate-700 rounded-xl px-4 py-2.5 text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono text-sm"
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
+
+              {/* Net Banking Tab View */}
+              {paymentTab === 'netbanking' && (
+                <div className="space-y-4 animate-[fade-in_0.2s_ease-out]">
+                  <div className="grid grid-cols-4 gap-2">
+                    {[
+                      { id: 'sbi', label: 'SBI' },
+                      { id: 'hdfc', label: 'HDFC' },
+                      { id: 'icici', label: 'ICICI' },
+                      { id: 'axis', label: 'AXIS' },
+                    ].map((bank) => (
+                      <button
+                        key={bank.id}
+                        type="button"
+                        onClick={() => setSelectedBank(bank.id)}
+                        className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-all cursor-pointer ${
+                          selectedBank === bank.id
+                            ? 'border-indigo-500 bg-indigo-500/10 text-white font-bold'
+                            : 'border-slate-800 bg-slate-900/30 text-slate-400 hover:border-slate-700'
+                        }`}
+                      >
+                        <span className="text-xs text-slate-350">{bank.label}</span>
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="block text-slate-400 text-xs font-medium">Select Bank</label>
+                    <select
+                      value={selectedBank}
+                      onChange={(e) => setSelectedBank(e.target.value)}
+                      className="w-full bg-slate-805 border border-slate-707 rounded-xl px-4 py-2.5 text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 cursor-pointer"
+                    >
+                      <option value="hdfc">HDFC Bank</option>
+                      <option value="sbi">State Bank of India</option>
+                      <option value="icici">ICICI Bank</option>
+                      <option value="axis">Axis Bank</option>
+                      <option value="kotak">Kotak Mahindra Bank</option>
+                      <option value="pnb">Punjab National Bank</option>
+                    </select>
+                  </div>
+                </div>
+              )}
+
+              {/* PayPal Tab View */}
+              {paymentTab === 'paypal' && (
+                <div className="space-y-4 animate-[fade-in_0.2s_ease-out]">
+                  <div className="border border-slate-800 bg-slate-900/20 p-4 rounded-xl text-center space-y-3">
+                    <span className="text-xl font-black text-indigo-400 tracking-tight block">PayPal</span>
+                    <p className="text-xs text-slate-450 leading-normal max-w-xs mx-auto">
+                      Pay quickly and safely using your PayPal account balance, bank account, or debit/credit cards.
+                    </p>
+                    <div className="w-fit mx-auto px-4 py-2 bg-amber-500 text-slate-950 font-bold rounded-lg text-xs flex items-center justify-center gap-1 shadow-md shadow-amber-500/10 select-none">
+                      <span>💳 Pay with</span><span className="font-extrabold text-blue-900">PayPal</span>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Security Note */}
-              <div className="flex items-center gap-2 text-slate-500 text-xs">
+              <div className="flex items-center gap-2 text-slate-500 text-xs border-t border-slate-800/60 pt-4">
                 <Shield className="w-3.5 h-3.5 text-emerald-500" />
                 Your payment is secured with 256-bit SSL encryption
               </div>
@@ -414,7 +545,7 @@ export default function Checkout() {
               className="w-full flex items-center justify-center gap-3 py-4 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-bold text-lg rounded-2xl transition-all duration-300 hover:shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-0.5"
             >
               <Lock className="w-5 h-5" />
-              Place Order — ${TOTAL.toFixed(2)}
+              Place Order — ₹{TOTAL.toFixed(2)}
             </button>
           </form>
 
@@ -447,7 +578,7 @@ export default function Checkout() {
                       <p className="text-slate-500 text-xs">Qty: {item.quantity}</p>
                     </div>
                     <span className="text-slate-200 text-sm font-semibold flex-shrink-0">
-                      ${(item.product.price * item.quantity).toFixed(2)}
+                      ₹{(item.product.price * item.quantity).toFixed(2)}
                     </span>
                   </div>
                 ))}
@@ -457,28 +588,28 @@ export default function Checkout() {
               <div className="border-t border-slate-700/50 pt-4 space-y-2.5">
                 <div className="flex justify-between text-sm">
                   <span className="text-slate-400">Subtotal</span>
-                  <span className="text-slate-200">${cartTotal.toFixed(2)}</span>
+                  <span className="text-slate-200">₹{cartTotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-slate-400">Shipping</span>
                   <span className={SHIPPING === 0 ? 'text-emerald-400' : 'text-slate-200'}>
-                    {SHIPPING === 0 ? 'FREE' : `$${SHIPPING.toFixed(2)}`}
+                    {SHIPPING === 0 ? 'FREE' : `₹${SHIPPING.toFixed(2)}`}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-slate-400">Tax (8%)</span>
-                  <span className="text-slate-200">${TAX.toFixed(2)}</span>
+                  <span className="text-slate-200">₹{TAX.toFixed(2)}</span>
                 </div>
 
                 {cartTotal > 100 && (
                   <div className="text-xs text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-3 py-1.5">
-                    🎉 Free shipping on orders over $100!
+                    🎉 Free shipping on orders over ₹100!
                   </div>
                 )}
 
                 <div className="border-t border-slate-700/50 pt-3 flex justify-between">
                   <span className="text-slate-200 font-semibold">Total</span>
-                  <span className="text-white font-black text-lg">${TOTAL.toFixed(2)}</span>
+                  <span className="text-white font-black text-lg">₹{TOTAL.toFixed(2)}</span>
                 </div>
               </div>
             </div>

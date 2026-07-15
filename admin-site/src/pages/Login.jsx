@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Lock, Mail, Terminal, ArrowRight } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
@@ -123,6 +123,13 @@ export default function Login() {
         </form>
 
         {/* Demo credentials tip */}
+        <div className="mt-6 text-center text-sm text-slate-500">
+          Need an admin account?{' '}
+          <Link to="/admin/signup" className="text-indigo-400 hover:text-indigo-300 transition-colors">
+            Create one
+          </Link>
+        </div>
+
         <div className="mt-8 pt-6 border-t border-slate-900 text-center">
           <p className="text-xs text-slate-500">
             Testing credentials:{" "}
